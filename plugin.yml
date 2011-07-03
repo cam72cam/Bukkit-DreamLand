@@ -1,0 +1,8 @@
+name: DreamLand
+main: me.cmesh.DreamLand.DreamLand
+version: 1.5
+commands:
+   setdreamspawn:
+      description: This will set the spawnpoint of DreamLand
+      usage: |
+          /setdreamspawn
