@@ -400,6 +400,8 @@ public class DreamLandPlayerListener extends PlayerListener
 				return null;
 			}
 			
+			inputLine.replace(',', '.');
+			
 			String splits[] = inputLine.split(" ", 3);
 			return new Location(plugin.getServer().getWorld(world), Double.parseDouble(splits[0]), Double.parseDouble(splits[1]), Double.parseDouble(splits[2]));
 		}
@@ -509,6 +511,7 @@ public class DreamLandPlayerListener extends PlayerListener
 			{
 				return null;
 			}
+			inputLine.replace(',', '.');
 			String splits[] = inputLine.split(" ", 3);
 			return new Location(dreamWorld(), Double.parseDouble(splits[0]), Double.parseDouble(splits[1]), Double.parseDouble(splits[2]));
 		}
