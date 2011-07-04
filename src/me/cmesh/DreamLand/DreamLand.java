@@ -1,5 +1,7 @@
 package me.cmesh.DreamLand;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -27,6 +29,8 @@ public class DreamLand extends JavaPlugin
     public Integer chance = 1;
     public Boolean dreamFly = true;
     public List<String> flyTool = Arrays.asList("288");
+    public Boolean seperateInv = false;
+    public Boolean kit = false;
     public Boolean portalExplode = true;
 	public Double flySpeed = 1.0;
 	public Boolean dreamInvincible;
@@ -96,6 +100,22 @@ public class DreamLand extends JavaPlugin
     	dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
 		dreamFly = getConfiguration().getBoolean("dreamland.fly",true);
 		flySpeed = getConfiguration().getDouble("dreamland.flySpeed", 1.0);
+		
+		seperateInv = getConfiguration().getBoolean("dreamland.seperateInventories", true);
+		kit = getConfiguration().getBoolean("dreamland.kit", false);
+		
+		if(kit && !new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt").exists())
+		{
+			try 
+			{
+				new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt").createNewFile();
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		flyTool = Arrays.asList(getConfiguration().getString("dreamland.flytool","288").split(","));
 		portalExplode = getConfiguration().getBoolean("dreamland.portalexplode",true);
 		getConfiguration().save();
