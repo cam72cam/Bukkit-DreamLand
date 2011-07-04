@@ -34,6 +34,7 @@ public class DreamLand extends JavaPlugin
     public Boolean portalExplode = true;
 	public Double flySpeed = 1.0;
 	public Boolean dreamInvincible;
+	public int attemptWait = 0;
 	
     public void onEnable()
 	{ 
@@ -100,6 +101,8 @@ public class DreamLand extends JavaPlugin
     	dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
 		dreamFly = getConfiguration().getBoolean("dreamland.fly",true);
 		flySpeed = getConfiguration().getDouble("dreamland.flySpeed", 1.0);
+		attemptWait = getConfiguration().getInt("dreamland.attemptWait", 0);
+		attemptWait *= 30;
 		
 		seperateInv = getConfiguration().getBoolean("dreamland.seperateInventories", true);
 		kit = getConfiguration().getBoolean("dreamland.kit", false);
@@ -119,5 +122,24 @@ public class DreamLand extends JavaPlugin
 		flyTool = Arrays.asList(getConfiguration().getString("dreamland.flytool","288").split(","));
 		portalExplode = getConfiguration().getBoolean("dreamland.portalexplode",true);
 		getConfiguration().save();
+		
+		
+		File lock =  new File(getDataFolder().getAbsolutePath() + File.separator + "Lock");
+		deleteDir(lock);
+		File attempts =  new File(getDataFolder().getAbsolutePath() + File.separator + "Attempts");
+		deleteDir(attempts);
 	}
+	public static boolean deleteDir(File dir) {
+	    if (dir.isDirectory()) {
+	        String[] children = dir.list();
+	        for (int i=0; i<children.length; i++) {
+	            boolean success = deleteDir(new File(dir, children[i]));
+	            if (!success) {
+	                return false;
+	            }
+	        }
+	    }
+	    return dir.delete();
+	}
+
 }

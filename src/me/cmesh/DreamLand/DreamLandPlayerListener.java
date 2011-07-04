@@ -154,40 +154,46 @@ public class DreamLandPlayerListener extends PlayerListener
     	Player player = event.getPlayer();
     	if (plugin.checkpermissions(player,"dreamland.goto",true) && !getLock(event.getPlayer()))
     	{
-    		if (new Random().nextInt(plugin.chance) == 0)
+    		if(plugin.attemptWait == 0 || getWait(player))
     		{
-	    		createLock(player);
-	    		
-				saveLocation(player, event.getBed().getLocation());
-
-				if(plugin.seperateInv)
-				{
-					savePlayerInv(player, player.getWorld());
-					loadPlayerInv(player, dreamWorld());
-				}
-				
-				Location loc = getSpawn();
-				
-			
-				try
-				{
-					player.teleport(loc);
-					playerSetSpawn(player);
-				}
-				catch (java.lang.NullPointerException e)
-				{
-					loc = dreamWorld().getSpawnLocation();					
-					player.teleport(loc);
-					saveSpawn(player);
-					playerSetSpawn(player);
-				}
-				
-				
-				
-				
-				removeLock(event.getPlayer());
-				
-		    	log.info(event.getPlayer().getName() + " went to Dream Land");
+	    		if (new Random().nextInt(plugin.chance) == 0)
+	    		{
+		    		createLock(player);
+		    		
+					saveLocation(player, event.getBed().getLocation());
+	
+					if(plugin.seperateInv)
+					{
+						savePlayerInv(player, player.getWorld());
+						loadPlayerInv(player, dreamWorld());
+					}
+					
+					clearAttempt(player);
+					
+					Location loc = getSpawn();
+									
+					try
+					{
+						player.teleport(loc);
+						playerSetSpawn(player);
+					}
+					catch (java.lang.NullPointerException e)
+					{
+						loc = dreamWorld().getSpawnLocation();					
+						player.teleport(loc);
+						saveSpawn(player);
+						playerSetSpawn(player);
+					}
+					
+					removeLock(event.getPlayer());
+					
+			    	log.info(event.getPlayer().getName() + " went to Dream Land");
+			    	return;
+	    		}
+    		}
+    		if(!attemptFile(player).exists())
+    		{
+    			setAttemptTime(player);
     		}
     	}
     }
@@ -213,6 +219,91 @@ public class DreamLandPlayerListener extends PlayerListener
     	//TODO have this happen less often
     }
 
+    //wait time
+    private File attemptFile(Player player)
+    {
+    	File attemptFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Attempts");
+		if (!attemptFolder.exists()) 
+		{
+			attemptFolder.mkdir();
+		}
+		return new File(attemptFolder + File.separator + player.getName());
+    }
+    
+    private void setAttemptTime(Player player)
+    {
+    	BufferedWriter bw;
+		try 
+		{
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(attemptFile(player))));
+			Long temp = plugin.getServer().getWorlds().get(0).getTime();
+			bw.write(temp.toString());
+			bw.close();
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
+    }
+    
+    private void clearAttempt(Player player)
+    {
+    	attemptFile(player).delete();
+    }
+    
+    private Long getAttemptTime(Player player)
+    {
+    	File save = attemptFile(player);
+    	Long retVal = Long.parseLong("0");
+		if (!save.exists()) 
+		{
+			return retVal;
+		}
+		
+		try 
+		{
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
+
+			String inputLine = br.readLine();
+			
+			if (inputLine == null) 
+			{
+				return retVal;
+			}
+			
+			inputLine = inputLine.replace(',', '.');
+			return Long.parseLong(inputLine);
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (java.lang.NumberFormatException e)
+		{
+			return retVal;
+		}
+
+		return retVal;
+    }
+    
+    private Boolean getWait(Player player)
+    {
+    	Long time = plugin.getServer().getWorlds().get(0).getTime() - getAttemptTime(player);
+    	if(time >= plugin.attemptWait)
+    	{
+    		setAttemptTime(player);
+    		return true;
+    	}
+   		else
+   		{
+   			player.sendMessage("Wait " + ((Long)((plugin.attemptWait - time)/30)).toString() + "s before trying again");
+    		return false;
+   		}
+    }
+    
     
     //Inventory store/switcher
     private File playerInv(Player player, World world)
@@ -259,7 +350,6 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
     }
 
-
     @SuppressWarnings("deprecation")
 	private void stringToInv(Player player, List<String> inv)
     {
@@ -292,23 +382,39 @@ public class DreamLandPlayerListener extends PlayerListener
     private void loadPlayerInv(Player player, World world)
     {
 		File save = playerInv(player, world);
-		if (!save.exists()) 
+		try 
 		{
-			if(plugin.kit && world.getName() == dreamWorld().getName())
+			if (!save.exists()) 
 			{
-				save = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "kit.txt");
-				if (!save.exists()) 
+				if(plugin.kit && world.getName() == dreamWorld().getName())
+				{
+					save = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "kit.txt");
+					if (!save.exists()) 
+					{
+						return;
+					}
+					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
+					
+					List<String> inv = new ArrayList<String>();
+					String inputLine = br.readLine();
+					
+					int count =0;
+					while (inputLine != null)
+					{
+						inv.add(count + " " + inputLine + " 0");
+						inputLine = br.readLine();
+						count++;
+					}
+					
+					stringToInv(player, inv);
+					return;
+				}
+				else
 				{
 					return;
 				}
 			}
-			else
-			{
-				return;
-			}
-		}
-		try 
-		{
+		
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
 			
 			List<String> inv = new ArrayList<String>();
@@ -378,8 +484,6 @@ public class DreamLandPlayerListener extends PlayerListener
 
 	
 	//saves bed locations of players
-
-	//used to manage bed location
 	private Location loadLocation(Player player) 
 	{
 		File save = getBedFile(player);
@@ -447,8 +551,6 @@ public class DreamLandPlayerListener extends PlayerListener
 	}
 
 
-	//used to prevent concurrent modification exceptions
-
 	//used to manage lock file to prevent concurrent modification exception
 	private File lockFile(Player player)
 	{
@@ -483,8 +585,6 @@ public class DreamLandPlayerListener extends PlayerListener
 
 	
 	//used to save the spawn location of a skylands world
-
-	//used to manage world spawn
 	private File spawnWorldFile(World world)
 	{
 		File spawnFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "WorldSpawn");
