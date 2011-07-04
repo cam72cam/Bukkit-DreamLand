@@ -186,7 +186,7 @@ public class DreamLandPlayerListener extends PlayerListener
 					}
 					
 					removeLock(event.getPlayer());
-					
+					player.sendMessage(plugin.message);
 			    	log.info(event.getPlayer().getName() + " went to Dream Land");
 			    	return;
 	    		}
@@ -204,7 +204,7 @@ public class DreamLandPlayerListener extends PlayerListener
     {
     	return plugin.getServer().getWorld(plugin.getServer().getWorlds().get(0).getName()+"_skylands");
     }
-
+ 
     private Boolean playerInDreamLand(Player player)
     {
     	return player.getWorld().getName().equalsIgnoreCase(dreamWorld().getName());

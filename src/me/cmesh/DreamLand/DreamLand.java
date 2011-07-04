@@ -34,7 +34,8 @@ public class DreamLand extends JavaPlugin
     public Boolean portalExplode = true;
 	public Double flySpeed = 1.0;
 	public Boolean dreamInvincible;
-	public int attemptWait = 0;
+	public Integer attemptWait = 0;
+	public String message = "Welcome to DreamLand!";
 	
     public void onEnable()
 	{ 
@@ -104,7 +105,9 @@ public class DreamLand extends JavaPlugin
 		attemptWait = getConfiguration().getInt("dreamland.attemptWait", 0);
 		attemptWait *= 30;
 		
-		seperateInv = getConfiguration().getBoolean("dreamland.seperateInventories", true);
+		message = getConfiguration().getString("dreamland.message", "Welcome to DreamLand!");
+		
+		seperateInv = getConfiguration().getBoolean("dreamland.seperateInventories", false  );
 		kit = getConfiguration().getBoolean("dreamland.kit", false);
 		
 		if(kit && !new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt").exists())
@@ -129,6 +132,7 @@ public class DreamLand extends JavaPlugin
 		File attempts =  new File(getDataFolder().getAbsolutePath() + File.separator + "Attempts");
 		deleteDir(attempts);
 	}
+
 	public static boolean deleteDir(File dir) {
 	    if (dir.isDirectory()) {
 	        String[] children = dir.list();
