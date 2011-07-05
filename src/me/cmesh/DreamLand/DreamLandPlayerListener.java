@@ -186,7 +186,10 @@ public class DreamLandPlayerListener extends PlayerListener
 					}
 					
 					removeLock(event.getPlayer());
-					player.sendMessage(plugin.message);
+					if(plugin.message)
+					{
+						message(player);
+					}
 			    	log.info(event.getPlayer().getName() + " went to Dream Land");
 			    	return;
 	    		}
@@ -219,6 +222,34 @@ public class DreamLandPlayerListener extends PlayerListener
     	//TODO have this happen less often
     }
 
+    private void message(Player player)
+    { 
+    	File save = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "message.txt");
+		if (!save.exists()) 
+		{
+			return;
+		}
+		
+		try 
+		{
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
+
+			String inputLine = br.readLine();
+			
+			while(inputLine != null) 
+			{
+				player.sendMessage(inputLine);
+				inputLine = br.readLine();
+			}
+			
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+    }
+
+    
     //wait time
     private File attemptFile(Player player)
     {

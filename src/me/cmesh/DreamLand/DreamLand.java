@@ -35,7 +35,7 @@ public class DreamLand extends JavaPlugin
 	public Double flySpeed = 1.0;
 	public Boolean dreamInvincible;
 	public Integer attemptWait = 0;
-	public String message = "Welcome to DreamLand!";
+	public Boolean message = false;
 	
     public void onEnable()
 	{ 
@@ -105,23 +105,21 @@ public class DreamLand extends JavaPlugin
 		attemptWait = getConfiguration().getInt("dreamland.attemptWait", 0);
 		attemptWait *= 30;
 		
-		message = getConfiguration().getString("dreamland.message", "Welcome to DreamLand!");
+		message = getConfiguration().getBoolean("dreamland.message", false);
 		
 		seperateInv = getConfiguration().getBoolean("dreamland.seperateInventories", false  );
 		kit = getConfiguration().getBoolean("dreamland.kit", false);
 		
-		if(kit && !new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt").exists())
+		File kitFile = new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt");
+		if(kit)
 		{
-			try 
-			{
-				new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt").createNewFile();
-			} 
-			catch (IOException e) 
-			{
-				e.printStackTrace();
-			}
+			createFile(kitFile);
 		}
-		
+		File messageFile = new File(getDataFolder().getAbsolutePath() + File.separator + "message.txt");
+		if(message)
+		{
+			createFile(messageFile);
+		}
 		flyTool = Arrays.asList(getConfiguration().getString("dreamland.flytool","288").split(","));
 		portalExplode = getConfiguration().getBoolean("dreamland.portalexplode",true);
 		getConfiguration().save();
@@ -146,4 +144,19 @@ public class DreamLand extends JavaPlugin
 	    return dir.delete();
 	}
 
+	public static void createFile(File file)
+	{
+		if(file.exists())
+		{
+			return;
+		}
+		try 
+		{
+			file.createNewFile();
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+	}
 }
