@@ -7,22 +7,24 @@ import org.bukkit.entity.Player;
 public class DreamLandEntityListener extends EntityListener
 {
 	public static DreamLand plugin;
-	public static World dreamworld;
 
 	public DreamLandEntityListener(DreamLand instance)
 	{
 		plugin = instance;
-		dreamworld = plugin.getServer().getWorld(plugin.getServer().getWorlds().get(0).getName()+"_skylands");
 	}
 
 	public void onEntityDamage(EntityDamageEvent event)
 	{
 		if (event.getEntity() instanceof Player)
 		{
-			if(event.getEntity().getWorld() == dreamworld && plugin.dreamInvincible)
+			if(playerInDreamLands(EntityDamageEvent event) && plugin.dreamInvincible)
 			{
 				event.setCancelled(true);
 	    		}
     		}
+	}
+	private Boolean playerInDreamLands(EntityDamageEvent event)
+	{
+		return (plugin.getServer().getWorld(plugin.getServer().getWorlds().get(0).getName()+"_skylands") == event.getEntity().getWorld());
 	}
 }
