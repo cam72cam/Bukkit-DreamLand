@@ -23,21 +23,21 @@ public class DreamLand extends JavaPlugin
 	public static final Logger log = Logger.getLogger("Minecraft");
 	private final DreamLandPlayerListener playerListener = new DreamLandPlayerListener(this);
 	private final DreamLandEntityListener entityListener = new DreamLandEntityListener(this);
-    public static PermissionHandler Permissions = null;
-    public Boolean anyoneCanGo = true;
-    public Boolean usingpermissions = false;
-    public Integer chance = 1;
-    public Boolean dreamFly = true;
-    public List<String> flyTool = Arrays.asList("288");
-    public Boolean seperateInv = false;
-    public Boolean kit = false;
-    public Boolean portalExplode = true;
+	public static PermissionHandler Permissions = null;
+	public Boolean anyoneCanGo = true;
+	public Boolean usingpermissions = false;
+	public Integer chance = 1;
+	public Boolean dreamFly = true;
+	public List<String> flyTool = Arrays.asList("288");
+	public Boolean seperateInv = false;
+	public Boolean kit = false;
+	public Boolean portalExplode = true;
 	public Double flySpeed = 1.0;
 	public Boolean dreamInvincible;
 	public Integer attemptWait = 0;
 	public Boolean message = false;
 	
-    public void onEnable()
+	public void onEnable()
 	{ 
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
@@ -47,20 +47,20 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
 
 
-    	Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
+		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
 		if (Permissions == null)
 		{
-		    if (permissions != null)
-		    {
-			    Permissions = ((Permissions)permissions).getHandler();
-			    log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled with permissions!");
-			    usingpermissions = true;
-		    }
-		    else
-		    {
-		    	log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled without permissions!");
-		    	usingpermissions = false;
-		    }
+			if (permissions != null)
+			{
+				Permissions = ((Permissions)permissions).getHandler();
+				log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled with permissions!");
+				usingpermissions = true;
+			}
+			else
+			{
+				log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled without permissions!");
+				usingpermissions = false;
+			}
 		}
 
 		reload();
@@ -69,24 +69,24 @@ public class DreamLand extends JavaPlugin
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
-	  {
-    	if (commandLabel.equalsIgnoreCase("setdreamspawn")) 
-    	{
-    		if (sender instanceof Player) 
-    		{
-    			Player player = (Player)sender;
-    			playerListener.saveSpawn(player);
-    			Location location = player.getLocation();
-    			player.sendMessage("Spawn set to: " + (int)location.getX() + "x," + (int)location.getY() + "y," + (int)location.getZ() + "z");
-    			return true;
-    		}
-    	}
-    	return false;
+	{
+		if (commandLabel.equalsIgnoreCase("setdreamspawn")) 
+		{
+			if (sender instanceof Player) 
+			{
+				Player player = (Player)sender;
+				playerListener.saveSpawn(player);
+				Location location = player.getLocation();
+				player.sendMessage("Spawn set to: " + (int)location.getX() + "x," + (int)location.getY() + "y," + (int)location.getZ() + "z");
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void onDisable()
 	{
-	    log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is disabled!");
+		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is disabled!");
 	}
 
 	public boolean checkpermissions(Player player, String string, Boolean standard)
@@ -98,8 +98,8 @@ public class DreamLand extends JavaPlugin
 	{
 		getConfiguration().load();
 		chance = getConfiguration().getInt("dreamland.chance",1);
-    	anyoneCanGo = getConfiguration().getBoolean("dreamland.allowAll",true);
-    	dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
+		anyoneCanGo = getConfiguration().getBoolean("dreamland.allowAll",true);
+		dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
 		dreamFly = getConfiguration().getBoolean("dreamland.fly",true);
 		flySpeed = getConfiguration().getDouble("dreamland.flySpeed", 1.0);
 		attemptWait = getConfiguration().getInt("dreamland.attemptWait", 0);
@@ -131,17 +131,20 @@ public class DreamLand extends JavaPlugin
 		deleteDir(attempts);
 	}
 
-	public static boolean deleteDir(File dir) {
-	    if (dir.isDirectory()) {
-	        String[] children = dir.list();
-	        for (int i=0; i<children.length; i++) {
-	            boolean success = deleteDir(new File(dir, children[i]));
-	            if (!success) {
-	                return false;
-	            }
-	        }
-	    }
-	    return dir.delete();
+	public static boolean deleteDir(File dir)
+	{
+		if (dir.isDirectory())
+		{
+			String[] children = dir.list();
+			for (int i=0; i<children.length; i++)
+			{
+				boolean success = deleteDir(new File(dir, children[i]));
+				if (!success) {
+					return false;
+				}
+			}
+		}
+		return dir.delete();
 	}
 
 	public static void createFile(File file)
