@@ -36,6 +36,7 @@ public class DreamLand extends JavaPlugin
 	public Boolean dreamInvincible;
 	public Integer attemptWait = 0;
 	public Boolean message = false;
+	public Boolean teleportOnQuit = false;
 	
 	public void onEnable()
 	{ 
@@ -43,6 +44,7 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_BED_ENTER, playerListener, Event.Priority.High, this);
+		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.High, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
 
@@ -121,6 +123,7 @@ public class DreamLand extends JavaPlugin
 			createFile(messageFile);
 		}
 		flyTool = Arrays.asList(getConfiguration().getString("dreamland.flytool","288").split(","));
+		teleportOnQuit = getConfiguration().getBoolean("dreamland.teleportOnQuit", false);
 		portalExplode = getConfiguration().getBoolean("dreamland.portalexplode",true);
 		getConfiguration().save();
 		

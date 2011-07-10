@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -188,6 +189,18 @@ public class DreamLandPlayerListener extends PlayerListener
     		}
     	}
     }
+	public void onPlayerQuit(PlayerQuitEvent event)
+	{
+    	Player player = event.getPlayer();
+    	
+    	if (playerInDreamLand(player))
+		{
+			Location loc = loadLocation(player);
+			loc.setY(loc.getY()+1.5);
+			
+			player.teleport(loc);
+		}
+	}
 
 	
 	//helper functions
