@@ -112,6 +112,16 @@ public class DreamLandPlayerListener extends PlayerListener
 					player.teleport(plugin.dreamWorld().getSpawnLocation());
 				}
 			}
+			if(plugin.morningReturn)
+			{
+				long time = loadLocation(player).getWorld().getTime();
+				if(time >=0 && time <= 12000)
+				{
+					player.sendMessage("It is morning, WAKEUP!");
+					leaveDreamLand(player);
+				}
+			}
+			
 		}
 	}
 	

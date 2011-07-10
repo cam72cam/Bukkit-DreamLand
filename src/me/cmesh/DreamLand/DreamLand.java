@@ -39,6 +39,7 @@ public class DreamLand extends JavaPlugin
 	public Boolean message = false;
 	public Boolean teleportOnQuit = false;
 	public String dreamLandWorld = "world_skylands";
+	public Boolean morningReturn = true;
 	
 	public void onEnable()
 	{ 
@@ -104,6 +105,7 @@ public class DreamLand extends JavaPlugin
 		getConfiguration().load();
 		dreamLandWorld = getConfiguration().getString("dreamland.world",getServer().getWorlds().get(0).getName()+"_skylands");
 		chance = getConfiguration().getInt("dreamland.chance",1);
+		morningReturn = getConfiguration().getBoolean("dreamland.morningReturn", true);
 		anyoneCanGo = getConfiguration().getBoolean("dreamland.allowAll",true);
 		dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
 		dreamFly = getConfiguration().getBoolean("dreamland.fly",true);
