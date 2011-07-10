@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -72,13 +71,6 @@ public class DreamLandPlayerListener extends PlayerListener
 							player.setVelocity(dir);
 							player.setFallDistance(0);
 						}
-						else if(getHover(player))
-						{
-							Vector dir = player.getLocation().getDirection();
-							dir.setY(0);
-							player.setVelocity(dir);
-							player.setFallDistance(0);
-						}
 					}
 				}
 			}
@@ -130,7 +122,13 @@ public class DreamLandPlayerListener extends PlayerListener
 					leaveDreamLand(player);
 				}
 			}
-			
+		}
+		else
+		{
+			if(playerSpawn(player))
+			{
+				leaveDreamLand(player);
+			}
 		}
 	}
 	
@@ -192,25 +190,10 @@ public class DreamLandPlayerListener extends PlayerListener
 		Player player = event.getPlayer();
     	if (playerInDreamLand(player))
 		{
-    		leaveDreamLand(player);
+    		playerSetSpawn(player);
 		}
 	}
 
-	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
-	{
-		if(plugin.flyHover)
-		{
-			if(event.isSneaking())
-			{
-				stopHover(event.getPlayer());
-			}
-			else
-			{
-				setHover(event.getPlayer());
-			}
-		}
-	}
-	
 	//helper functions
  
 	private Boolean playerInDreamLand(Player player)
@@ -322,40 +305,6 @@ public class DreamLandPlayerListener extends PlayerListener
     }
     
     
-    //hover
-    private File hoverFile(Player player)
-    {
-    	File hoverFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Hover");
-		if (!hoverFolder.exists()) 
-		{
-			hoverFolder.mkdir();
-		}
-		return new File(hoverFolder + File.separator + player.getName());
-    }
-
-    private void setHover(Player player)
-    {
-    	try
-		{
-    		hoverFile(player).createNewFile();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
-
-    private void stopHover(Player player)
-    {
-    	hoverFile(player).delete();
-    }
-
-    private Boolean getHover(Player player)
-    {
-    	return hoverFile(player).exists();
-    }
-    
-    
-    
     //wait time
 	private File attemptFile(Player player)
 	{
@@ -442,6 +391,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	}
 	
 	
+
 	//Inventory store/switcher
 	private File playerInv(Player player, World world)
 	{

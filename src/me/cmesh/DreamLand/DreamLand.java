@@ -52,7 +52,6 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_TOGGLE_SNEAK, playerListener,Event.Priority.High, this); 
 
 
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
@@ -72,8 +71,7 @@ public class DreamLand extends JavaPlugin
 		}
 
 		reload();
-
-		getServer().createWorld(dreamWorld().getName(),Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
+		getServer().createWorld(dreamLandWorld,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
