@@ -30,6 +30,7 @@ public class DreamLand extends JavaPlugin
 	public Integer chance = 1;
 	public Boolean dreamFly = true;
 	public List<String> flyTool = Arrays.asList("288");
+	public Boolean flyHover = true;
 	public Boolean seperateInv = false;
 	public Boolean kit = false;
 	public Boolean portalExplode = true;
@@ -51,6 +52,7 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_TOGGLE_SNEAK, playerListener,Event.Priority.High, this); 
 
 
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
@@ -109,6 +111,7 @@ public class DreamLand extends JavaPlugin
 		anyoneCanGo = getConfiguration().getBoolean("dreamland.allowAll",true);
 		dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
 		dreamFly = getConfiguration().getBoolean("dreamland.fly",true);
+		flyHover = getConfiguration().getBoolean("dreamland.flyHover", true);
 		flySpeed = getConfiguration().getDouble("dreamland.flySpeed", 1.0);
 		attemptWait = getConfiguration().getInt("dreamland.attemptWait", 0);
 		attemptWait *= 30;

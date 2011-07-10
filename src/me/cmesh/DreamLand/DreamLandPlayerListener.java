@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -61,12 +62,20 @@ public class DreamLandPlayerListener extends PlayerListener
 			{
 				if (playerInDreamLand(player))
 				{
-					if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
+					if (plugin.flyTool.contains("-1") || plugin.flyTool.contains(Integer.toString(event.getPlayer().getItemInHand().getTypeId())))
 					{
-						if (plugin.flyTool.contains("-1") || plugin.flyTool.contains(Integer.toString(event.getPlayer().getItemInHand().getTypeId())))
+						if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
 						{
+						
 							Vector dir = player.getLocation().getDirection().multiply(plugin.flySpeed);
 							dir.setY(0.75);
+							player.setVelocity(dir);
+							player.setFallDistance(0);
+						}
+						else if(getHover(player))
+						{
+							Vector dir = player.getLocation().getDirection();
+							dir.setY(0);
 							player.setVelocity(dir);
 							player.setFallDistance(0);
 						}
@@ -187,7 +196,20 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 	}
 
-	
+	public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
+	{
+		if(plugin.flyHover)
+		{
+			if(event.isSneaking())
+			{
+				stopHover(event.getPlayer());
+			}
+			else
+			{
+				setHover(event.getPlayer());
+			}
+		}
+	}
 	
 	//helper functions
  
@@ -297,6 +319,39 @@ public class DreamLandPlayerListener extends PlayerListener
 			loadPlayerInv(player, loc.getWorld());
 		}
 		log.info(player.getName() + " left DreamLand");
+    }
+    
+    
+    //hover
+    private File hoverFile(Player player)
+    {
+    	File hoverFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Hover");
+		if (!hoverFolder.exists()) 
+		{
+			hoverFolder.mkdir();
+		}
+		return new File(hoverFolder + File.separator + player.getName());
+    }
+
+    private void setHover(Player player)
+    {
+    	try
+		{
+    		hoverFile(player).createNewFile();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+
+    private void stopHover(Player player)
+    {
+    	hoverFile(player).delete();
+    }
+
+    private Boolean getHover(Player player)
+    {
+    	return hoverFile(player).exists();
     }
     
     
