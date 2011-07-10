@@ -461,8 +461,10 @@ public class DreamLandPlayerListener extends PlayerListener
 		player.updateInventory();
 	}
 
+	@SuppressWarnings("deprecation")
 	private void loadPlayerInv(Player player, World world)
 	{
+		player.getInventory().clear();
 		File save = playerInv(player, world);
 		try 
 		{
@@ -518,6 +520,9 @@ public class DreamLandPlayerListener extends PlayerListener
 		{
 			e.printStackTrace();
 		}
+		//only way to get inv to update 
+		//TODO Do this properly!
+		player.updateInventory();
 	}
 	
 	
