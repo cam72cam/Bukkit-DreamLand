@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -37,6 +38,7 @@ public class DreamLand extends JavaPlugin
 	public Integer attemptWait = 0;
 	public Boolean message = false;
 	public Boolean teleportOnQuit = false;
+	public String dreamLandWorld = "world_skylands";
 	
 	public void onEnable()
 	{ 
@@ -47,6 +49,7 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.High, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
 
 
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
@@ -67,7 +70,7 @@ public class DreamLand extends JavaPlugin
 
 		reload();
 
-		getServer().createWorld(getServer().getWorlds().get(0).getName()+"_skylands",Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
+		getServer().createWorld(dreamWorld().getName(),Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
@@ -99,6 +102,7 @@ public class DreamLand extends JavaPlugin
 	public void reload()
 	{
 		getConfiguration().load();
+		dreamLandWorld = getConfiguration().getString("dreamland.world",getServer().getWorlds().get(0).getName()+"_skylands");
 		chance = getConfiguration().getInt("dreamland.chance",1);
 		anyoneCanGo = getConfiguration().getBoolean("dreamland.allowAll",true);
 		dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
@@ -132,6 +136,10 @@ public class DreamLand extends JavaPlugin
 		deleteDir(lock);
 		File attempts =  new File(getDataFolder().getAbsolutePath() + File.separator + "Attempts");
 		deleteDir(attempts);
+	}
+	public World dreamWorld()
+	{
+		return getServer().getWorld(dreamLandWorld);
 	}
 
 	public static boolean deleteDir(File dir)
