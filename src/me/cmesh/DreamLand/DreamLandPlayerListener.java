@@ -728,38 +728,49 @@ public class DreamLandPlayerListener extends PlayerListener
 		Block blockCheck = null;
 		double spawnoffset = 0.5;
 		
-		if (block.getRelative(BlockFace.NORTH).getType() == Material.AIR) {
+		if (block.getRelative(BlockFace.NORTH).getType() == Material.AIR) 
+		{
 			blockCheck = block.getRelative(BlockFace.NORTH);
 			Location blockCheckLoc = blockCheck.getLocation();
 			
-			if (blockCheck.getRelative(BlockFace.UP).getType() == Material.AIR) {
+			if (blockCheck.getRelative(BlockFace.UP).getType() == Material.AIR) 
+			{
 				blockCheckLoc.setX(blockCheckLoc.getX()-spawnoffset);
 				
 				return blockCheckLoc;
 			}
-		} else if (block.getRelative(BlockFace.EAST).getType() == Material.AIR) {
+		}
+		else if (block.getRelative(BlockFace.EAST).getType() == Material.AIR) 
+		{
 			blockCheck = block.getRelative(BlockFace.EAST);
 			Location blockCheckLoc = blockCheck.getLocation();
 			
-			if (blockCheck.getRelative(BlockFace.UP).getType() == Material.AIR) {
+			if (blockCheck.getRelative(BlockFace.UP).getType() == Material.AIR) 
+			{
 				blockCheckLoc.setZ(blockCheckLoc.getZ()-spawnoffset);
 				
 				return blockCheckLoc;
 			}
-		} else if (block.getRelative(BlockFace.SOUTH).getType() == Material.AIR) {
+		}
+		else if (block.getRelative(BlockFace.SOUTH).getType() == Material.AIR) 
+		{
 			blockCheck = block.getRelative(BlockFace.SOUTH);
 			Location blockCheckLoc = blockCheck.getLocation();
 			
-			if (blockCheck.getRelative(BlockFace.UP).getType() == Material.AIR) {
+			if (blockCheck.getRelative(BlockFace.UP).getType() == Material.AIR) 
+			{
 				blockCheckLoc.setX(blockCheckLoc.getX()+spawnoffset);
 				
 				return blockCheckLoc;
 			}
-		} else if (block.getRelative(BlockFace.WEST).getType() == Material.AIR) {
+		}
+		else if (block.getRelative(BlockFace.WEST).getType() == Material.AIR) 
+		{
 			blockCheck = block.getRelative(BlockFace.WEST);
 			Location blockCheckLoc = blockCheck.getLocation();
 			
-			if (blockCheck.getRelative(BlockFace.UP).getType() == Material.AIR) {
+			if (blockCheck.getRelative(BlockFace.UP).getType() == Material.AIR) 
+			{
 				blockCheckLoc.setZ(blockCheckLoc.getZ()+spawnoffset);
 				
 				return blockCheckLoc;
