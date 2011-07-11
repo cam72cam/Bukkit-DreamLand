@@ -81,9 +81,10 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
 		Player player = event.getPlayer();
-		if (plugin.portalExplode)
+
+		if (playerDreaming(player))
 		{
-			if (playerInDreamLand(player))
+			if (plugin.portalExplode)
 			{
 				Location portal = event.getTo();
 				if (portal.getBlock().getTypeId() == 90)
@@ -95,19 +96,25 @@ public class DreamLandPlayerListener extends PlayerListener
 					portal.getWorld().createExplosion(portal.getBlock().getRelative(BlockFace.UP).getLocation(),5);
 				}
 			}
-		}
-		if (playerInDreamLand(player))
-		{
-			noWeather(player);
+			noWeather(player);//TODO !this probably should be run less often!
 			if (event.getTo().getY() < 0)
 			{
 				leaveDreamLand(player);
 			}
 			if(playerSpawn(player))
 			{
+				Location loc = null;
+				if(playerInNightmare(player))
+				{
+					loc = plugin.nightmareWorld().getSpawnLocation();
+				}
+				else
+				{
+					loc = getSpawn();
+				}
 				try
 				{
-					player.teleport(getSpawn());
+					player.teleport(loc);
 				}
 				catch (java.lang.NullPointerException e)
 				{
@@ -126,7 +133,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 		else
 		{
-			if(playerSpawn(player))
+			if(playerSpawn(player))//for respawn (is this nessesary)
 			{
 				leaveDreamLand(player);
 			}
@@ -136,13 +143,13 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerBedEnter(PlayerBedEnterEvent event)
 	{
 		Player player = event.getPlayer();
-		if (plugin.checkpermissions(player,"dreamland.goto",true) && !getLock(event.getPlayer()))
+		if (plugin.checkpermissions(player,"dreamland.goto",true) && !getLock(player) && !playerDreaming(player))
 		{
 			if(plugin.attemptWait == 0 || getWait(player))
 			{
 				if (new Random().nextInt(plugin.chance) == 0)
 				{
-					enterDreamLand(player, event.getBed().getLocation());
+					enterDreamLand(player, event.getBed().getLocation(), new Random().nextInt(plugin.nightmareChance) == 0);
 	    		}
     		}
     		if(!attemptFile(player).exists())
@@ -156,7 +163,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	{
     	Player player = event.getPlayer();
     	
-    	if (playerInDreamLand(player) && plugin.teleportOnQuit)
+    	if (playerDreaming(player) && plugin.teleportOnQuit)
 		{
     		leaveDreamLand(player);
 		}
@@ -165,7 +172,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerRespawn(PlayerRespawnEvent event)
 	{
 		Player player = event.getPlayer();
-    	if (playerInDreamLand(player))
+    	if (playerDreaming(player))
 		{
     		playerSetSpawn(player);
 		}
@@ -173,11 +180,21 @@ public class DreamLandPlayerListener extends PlayerListener
 
 	//helper functions
  
+	private Boolean playerDreaming(Player player)
+	{
+		return playerInDreamLand(player) || (playerInNightmare(player) && plugin.nightmare);
+	}
+	
 	private Boolean playerInDreamLand(Player player)
 	{
 		return player.getWorld().getName().equalsIgnoreCase(plugin.dreamWorld().getName());
 	}
 
+	private Boolean playerInNightmare(Player player)
+	{
+		return player.getWorld().getName().equalsIgnoreCase(plugin.nightmareWorld);
+	}
+	
 	private void noWeather(Player player)
 	{
 		World world = player.getWorld();
@@ -214,7 +231,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
     }
 
-    private void enterDreamLand(Player player, Location bed)
+    private void enterDreamLand(Player player, Location bed, Boolean nightmare)
     {
     	createLock(player);
 		
@@ -223,12 +240,23 @@ public class DreamLandPlayerListener extends PlayerListener
 		if(plugin.seperateInv)
 		{
 			savePlayerInv(player, player.getWorld());
-			loadPlayerInv(player, plugin.dreamWorld());
+			if(!nightmare)
+			{
+				loadPlayerInv(player, plugin.dreamWorld());
+			}
 		}
 		
 		clearAttempt(player);
 		
-		Location loc = getSpawn();
+		Location loc = null; 
+		if(nightmare)
+		{
+			loc = plugin.nightmareWorld().getSpawnLocation();
+		}
+		else
+		{
+			loc = getSpawn();
+		}
 						
 		try
 		{
@@ -249,11 +277,13 @@ public class DreamLandPlayerListener extends PlayerListener
 			message(player);
 		}
     	log.info(player.getName() + " went to Dream Land");
+    	player.setFireTicks(20);
     	return;
     }
  
     private void leaveDreamLand(Player player)
     {
+    	player.setFireTicks(0);
     	Location loc = null;
 		try
 		{

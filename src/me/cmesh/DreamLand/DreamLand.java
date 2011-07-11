@@ -40,6 +40,9 @@ public class DreamLand extends JavaPlugin
 	public Boolean message = false;
 	public Boolean teleportOnQuit = false;
 	public String dreamLandWorld = "world_skylands";
+	public String nightmareWorld = "world_nightmare";
+	public Boolean nightmare = true;
+	public Integer nightmareChance = 1;
 	public Boolean morningReturn = true;
 	
 	public void onEnable()
@@ -71,6 +74,7 @@ public class DreamLand extends JavaPlugin
 		}
 
 		reload();
+		getServer().createWorld(nightmareWorld, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
 		getServer().createWorld(dreamLandWorld,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
 	}
 
@@ -145,6 +149,10 @@ public class DreamLand extends JavaPlugin
 	public World dreamWorld()
 	{
 		return getServer().getWorld(dreamLandWorld);
+	}
+	public World nightmareWorld()
+	{
+		return getServer().getWorld(nightmareWorld);
 	}
 
 	public static boolean deleteDir(File dir)
