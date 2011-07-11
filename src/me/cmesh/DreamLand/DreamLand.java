@@ -30,8 +30,8 @@ public class DreamLand extends JavaPlugin
 	public Integer chance = 1;
 	public Boolean dreamFly = true;
 	public List<String> flyTool = Arrays.asList("288");
-	public Boolean flyHover = true;
 	public Boolean seperateInv = false;
+	public Boolean seperateInvInitial = true;
 	public Boolean kit = false;
 	public Boolean portalExplode = true;
 	public Double flySpeed = 1.0;
@@ -109,7 +109,6 @@ public class DreamLand extends JavaPlugin
 		anyoneCanGo = getConfiguration().getBoolean("dreamland.allowAll",true);
 		dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
 		dreamFly = getConfiguration().getBoolean("dreamland.fly",true);
-		flyHover = getConfiguration().getBoolean("dreamland.flyHover", true);
 		flySpeed = getConfiguration().getDouble("dreamland.flySpeed", 1.0);
 		attemptWait = getConfiguration().getInt("dreamland.attemptWait", 0);
 		attemptWait *= 30;
@@ -117,6 +116,8 @@ public class DreamLand extends JavaPlugin
 		message = getConfiguration().getBoolean("dreamland.message", false);
 		
 		seperateInv = getConfiguration().getBoolean("dreamland.seperateInventories", false  );
+		seperateInvInitial = getConfiguration().getBoolean("dreamland.seperateInitialInventories", true);
+		
 		kit = getConfiguration().getBoolean("dreamland.kit", false);
 		
 		File kitFile = new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt");
@@ -140,6 +141,7 @@ public class DreamLand extends JavaPlugin
 		File attempts =  new File(getDataFolder().getAbsolutePath() + File.separator + "Attempts");
 		deleteDir(attempts);
 	}
+
 	public World dreamWorld()
 	{
 		return getServer().getWorld(dreamLandWorld);

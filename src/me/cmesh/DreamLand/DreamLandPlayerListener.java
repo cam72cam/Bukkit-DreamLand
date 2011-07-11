@@ -155,7 +155,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	{
     	Player player = event.getPlayer();
     	
-    	if (playerInDreamLand(player))
+    	if (playerInDreamLand(player) && plugin.teleportOnQuit)
 		{
     		Location loc = null;
 			try
@@ -469,7 +469,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	@SuppressWarnings("deprecation")
 	private void loadPlayerInv(Player player, World world)
 	{
-		player.getInventory().clear();
+		
 		File save = playerInv(player, world);
 		try 
 		{
@@ -500,6 +500,13 @@ public class DreamLandPlayerListener extends PlayerListener
 				}
 				else
 				{
+					if(plugin.seperateInvInitial)
+					{
+						player.getInventory().clear();
+						//only way to get inv to update 
+						//TODO Do this properly!
+						player.updateInventory();
+					}
 					return;
 				}
 			}
@@ -516,6 +523,7 @@ public class DreamLandPlayerListener extends PlayerListener
 			}
 			
 			stringToInv(player, inv);
+			return;
 		}
 		catch (IOException e) 
 		{
@@ -525,9 +533,6 @@ public class DreamLandPlayerListener extends PlayerListener
 		{
 			e.printStackTrace();
 		}
-		//only way to get inv to update 
-		//TODO Do this properly!
-		player.updateInventory();
 	}
 	
 	
