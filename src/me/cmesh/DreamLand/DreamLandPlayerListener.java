@@ -158,30 +158,7 @@ public class DreamLandPlayerListener extends PlayerListener
     	
     	if (playerInDreamLand(player) && plugin.teleportOnQuit)
 		{
-    		Location loc = null;
-			try
-			{
-				player.setFallDistance(0);
-				loc = loadLocation(player);
-				
-				player.setFallDistance(0);
-				player.teleport(checkBedSpawnLoc(loc));
-				player.setFallDistance(0);
-			}
-			catch (java.lang.NullPointerException e)
-			{
-				loc = plugin.getServer().getWorlds().get(0).getSpawnLocation();
-				player.setFallDistance(0);
-				player.teleport(loc);
-				player.setFallDistance(0);
-			}
-			if(plugin.seperateInv)
-			{
-				savePlayerInv(player, plugin.dreamWorld());
-				player.getInventory().clear();
-				loadPlayerInv(player, loc.getWorld());
-			}
-			log.info(player.getName() + " left DreamLand");
+    		leaveDreamLand(player);
 		}
 	}
 
