@@ -103,23 +103,27 @@ public class DreamLandPlayerListener extends PlayerListener
 			}
 			if(playerSpawn(player))
 			{
-				Location loc = null;
-				if(playerInNightmare(player))
-				{
-					loc = plugin.nightmareWorld().getSpawnLocation();
-				}
-				else
-				{
-					loc = getSpawn();
-				}
+				Location loc = getSpawn(player.getWorld());
 				try
 				{
 					player.teleport(loc);
 				}
 				catch (java.lang.NullPointerException e)
 				{
-					player.teleport(plugin.dreamWorld().getSpawnLocation());
+					if(playerInNightmare(player))
+					{
+						loc = plugin.nightmareWorld().getSpawnLocation();
+					}
+					else
+					{
+						loc = plugin.dreamWorld().getSpawnLocation();
+					}
+					player.teleport(loc);
 				}
+				if(playerInNightmare(player))
+		    	{
+		    		player.setFireTicks(20);
+		    	}
 			}
 			if(plugin.morningReturn)
 			{
@@ -251,24 +255,31 @@ public class DreamLandPlayerListener extends PlayerListener
 		Location loc = null; 
 		if(nightmare)
 		{
-			loc = plugin.nightmareWorld().getSpawnLocation();
+			loc = getSpawn(plugin.nightmareWorld());
 		}
 		else
 		{
-			loc = getSpawn();
+			loc = getSpawn(plugin.dreamWorld());
 		}
 						
 		try
 		{
 			player.teleport(loc);
-			playerSetSpawn(player);
+			playerSetSpawn(player); //set double tp
 		}
 		catch (java.lang.NullPointerException e)
 		{
-			loc = plugin.dreamWorld().getSpawnLocation();					
+			if(!nightmare)
+			{
+				loc = plugin.dreamWorld().getSpawnLocation();
+			}
+			else
+			{
+				loc = plugin.nightmareWorld().getSpawnLocation();
+			}
 			player.teleport(loc);
 			saveSpawn(player);
-			playerSetSpawn(player);
+			playerSetSpawn(player); //set double tp
 		}
 		
 		removeLock(player);
@@ -277,7 +288,10 @@ public class DreamLandPlayerListener extends PlayerListener
 			message(player);
 		}
     	log.info(player.getName() + " went to Dream Land");
-    	player.setFireTicks(20);
+    	if(playerInNightmare(player))
+    	{
+    		player.setFireTicks(20);
+    	}
     	return;
     }
  
@@ -698,9 +712,9 @@ public class DreamLandPlayerListener extends PlayerListener
 		return new File(spawnFolder + File.separator + world.getName() + ".spawn");
 	}
 	
-	private Location getSpawn() 
+	private Location getSpawn(World world) 
 	{
-		File save = spawnWorldFile(plugin.dreamWorld());
+		File save = spawnWorldFile(world);
 		if (!save.exists()) 
 		{
 			return null;
@@ -716,7 +730,7 @@ public class DreamLandPlayerListener extends PlayerListener
 			}
 			inputLine = inputLine.replace(',', '.');
 			String splits[] = inputLine.split(" ", 3);
-			return new Location(plugin.dreamWorld(), Double.parseDouble(splits[0]), Double.parseDouble(splits[1]), Double.parseDouble(splits[2]));
+			return new Location(world, Double.parseDouble(splits[0]), Double.parseDouble(splits[1]), Double.parseDouble(splits[2]));
 		}
 		catch (IOException e) 
 		{
@@ -732,11 +746,11 @@ public class DreamLandPlayerListener extends PlayerListener
 
 	public void saveSpawn(Player player)
 	{
-		if(plugin.checkpermissions(player,"dreamland.setdreamspawn",true) && playerInDreamLand(player) && player.getLocation().getY() > 0)
+		if(plugin.checkpermissions(player,"dreamland.setdreamspawn",true) && playerDreaming(player) && player.getLocation().getY() > 0)
  		{
 			Location location = player.getLocation();
-			location.setY(location.getY() + 5);
-			File save = spawnWorldFile(plugin.dreamWorld());
+			//location.setY(location.getY() + 1);
+			File save = spawnWorldFile(player.getWorld());
 			BufferedWriter bw;
 			try {
 				bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(save)));
