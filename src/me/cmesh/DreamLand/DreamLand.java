@@ -44,9 +44,12 @@ public class DreamLand extends JavaPlugin
 	public Boolean nightmare = true;
 	public Integer nightmareChance = 1;
 	public Boolean morningReturn = true;
+	public Long tick = (long)0;
 	
 	public void onEnable()
 	{ 
+		tick = getServer().getWorlds().get(0).getTime();
+		log.info(tick + "");
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
