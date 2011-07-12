@@ -77,7 +77,14 @@ public class DreamLand extends JavaPlugin
 		}
 
 		reload();
-		getServer().createWorld(nightmareWorld, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
+		
+		// Load Nightmare world
+		if(nightmare)
+		{
+			getServer().createWorld(nightmareWorld, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
+		}
+		
+		// Load DreamWorld
 		getServer().createWorld(dreamLandWorld,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
 	}
 
