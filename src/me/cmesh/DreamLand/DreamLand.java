@@ -28,16 +28,17 @@ public class DreamLand extends JavaPlugin
 	public static PermissionHandler Permissions = null;
 	
 	public HashMap<String, Location> Beds = new HashMap<String, Location>();
+	public HashMap<String, Integer> DoubleSpawn = new HashMap<String, Integer>();
+	public HashMap<String, Long> Attempt = new HashMap<String, Long>();
 	
 	public Boolean anyoneCanGo = true;
 	public Boolean usingpermissions = false;
-	public Integer chance = 1;
+	public Integer chance = 2;
 	public Boolean dreamFly = true;
 	public List<String> flyTool = Arrays.asList("288");
 	public Boolean seperateInv = false;
 	public Boolean seperateInvInitial = true;
 	public Boolean kit = false;
-	public Boolean portalExplode = true;
 	public Double flySpeed = 1.0;
 	public Boolean dreamInvincible;
 	public Integer attemptWait = 0;
@@ -46,14 +47,13 @@ public class DreamLand extends JavaPlugin
 	public String dreamLandWorld = "world_skylands";
 	public String nightmareWorld = "world_nightmare";
 	public Boolean nightmare = true;
-	public Integer nightmareChance = 1;
+	public Integer nightmareChance = 3;
 	public Boolean morningReturn = true;
 	public Long tick = (long)0;
 	
 	public void onEnable()
 	{ 
 		tick = getServer().getWorlds().get(0).getTime();
-		log.info(tick + "");
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
@@ -87,10 +87,12 @@ public class DreamLand extends JavaPlugin
 		if(nightmare)
 		{
 			getServer().createWorld(nightmareWorld, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
+			nightmareWorld().loadChunk(nightmareWorld().getSpawnLocation().getBlock().getChunk());
 		}
 		
 		// Load DreamWorld
 		getServer().createWorld(dreamLandWorld,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
+		dreamWorld().loadChunk(dreamWorld().getSpawnLocation().getBlock().getChunk());
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
@@ -99,11 +101,15 @@ public class DreamLand extends JavaPlugin
 		{
 			if (sender instanceof Player) 
 			{
+
 				Player player = (Player)sender;
-				playerListener.saveSpawn(player);
-				Location location = player.getLocation();
-				player.sendMessage("Spawn set to: " + (int)location.getX() + "x," + (int)location.getY() + "y," + (int)location.getZ() + "z");
-				return true;
+				if(playerListener.playerDreaming(player))
+				{
+					Location location = player.getLocation();
+					player.getWorld().setSpawnLocation((int)location.getX(), (int)location.getY(), (int)location.getZ());
+					player.sendMessage("Spawn set to: " + (int)location.getX() + "x," + (int)location.getY() + "y," + (int)location.getZ() + "z");
+					return true;
+				}
 			}
 		}
 		return false;
@@ -122,8 +128,12 @@ public class DreamLand extends JavaPlugin
 	public void reload()
 	{
 		getConfiguration().load();
-		dreamLandWorld = getConfiguration().getString("dreamland.world",getServer().getWorlds().get(0).getName()+"_skylands");
+		dreamLandWorld = getConfiguration().getString("dreamland.dreamWorld",getServer().getWorlds().get(0).getName()+"_skylands");
+		nightmareWorld = getConfiguration().getString("dreamland.nightmareWorld",getServer().getWorlds().get(0).getName()+"_nightmare");
+		
 		chance = getConfiguration().getInt("dreamland.chance",1);
+		nightmareChance = getConfiguration().getInt("dreamland.nightmareChance",3);
+		
 		morningReturn = getConfiguration().getBoolean("dreamland.morningReturn", true);
 		anyoneCanGo = getConfiguration().getBoolean("dreamland.allowAll",true);
 		dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
@@ -140,18 +150,13 @@ public class DreamLand extends JavaPlugin
 		kit = getConfiguration().getBoolean("dreamland.kit", false);
 		
 		File kitFile = new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt");
-		if(kit)
-		{
-			createFile(kitFile);
-		}
+		createFile(kitFile);
+		
 		File messageFile = new File(getDataFolder().getAbsolutePath() + File.separator + "message.txt");
-		if(message)
-		{
-			createFile(messageFile);
-		}
+		createFile(messageFile);
+		
 		flyTool = Arrays.asList(getConfiguration().getString("dreamland.flytool","288").split(","));
 		teleportOnQuit = getConfiguration().getBoolean("dreamland.teleportOnQuit", false);
-		portalExplode = getConfiguration().getBoolean("dreamland.portalexplode",true);
 		getConfiguration().save();
 		
 		
