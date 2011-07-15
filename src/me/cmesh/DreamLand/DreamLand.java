@@ -63,6 +63,7 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.High, this);
+		pm.registerEvent(Event.Type.PLAYER_KICK, entityListener, Event.Priority.High, this);
 
 
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");

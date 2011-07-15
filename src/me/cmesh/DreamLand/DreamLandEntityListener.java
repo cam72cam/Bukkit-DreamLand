@@ -2,6 +2,7 @@ package me.cmesh.DreamLand;
 
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.entity.Player;
 
 public class DreamLandEntityListener extends EntityListener
@@ -20,11 +21,19 @@ public class DreamLandEntityListener extends EntityListener
 			if(playerInDreamLands(event) && plugin.dreamInvincible)
 			{
 				event.setCancelled(true);
-	    		}
     		}
+		}
+	}
+	public void onPlayerKick(PlayerKickEvent event)
+	{
+		//TODO make this only for when moving between worlds
+		if(event.getReason().contains("moved too quickly")) 
+		{
+			event.setCancelled(true);
+		}
 	}
 	private Boolean playerInDreamLands(EntityDamageEvent event)
 	{
-		return (plugin.getServer().getWorld(plugin.getServer().getWorlds().get(0).getName()+"_skylands") == event.getEntity().getWorld());
+		return (plugin.dreamWorld().equals(event.getEntity().getWorld()));
 	}
 }
