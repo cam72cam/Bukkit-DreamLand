@@ -131,7 +131,8 @@ public class DreamLand extends JavaPlugin
 		getConfiguration().load();
 		dreamLandWorld = getConfiguration().getString("dreamland.dreamWorld",getServer().getWorlds().get(0).getName()+"_skylands");
 		nightmareWorld = getConfiguration().getString("dreamland.nightmareWorld",getServer().getWorlds().get(0).getName()+"_nightmare");
-		
+		nightmare = getConfiguration().getBoolean("dreamland.haveNightmare", true);
+
 		chance = getConfiguration().getInt("dreamland.chance",1);
 		nightmareChance = getConfiguration().getInt("dreamland.nightmareChance",3);
 		
