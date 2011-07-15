@@ -84,23 +84,11 @@ public class DreamLandPlayerListener extends PlayerListener
 
 		if (playerDreaming(player))
 		{
-			if (plugin.portalExplode)
-			{
-				Location portal = event.getTo();
-				if (portal.getBlock().getTypeId() == 90)
-				{
-					portal.getWorld().createExplosion(portal.getBlock().getRelative(BlockFace.UP).getLocation(),5);
-				}
-				else if (portal.getBlock().getRelative(BlockFace.UP).getTypeId() == 90)
-				{
-					portal.getWorld().createExplosion(portal.getBlock().getRelative(BlockFace.UP).getLocation(),5);
-				}
-			}
 			Boolean tick = tick();
 			
 			if(tick)
 			{
-				noWeather(player);//TODO !this probably should be run less often!
+				noWeather(player);
 			}
 			if (event.getTo().getY() < 0)
 			{
@@ -135,7 +123,7 @@ public class DreamLandPlayerListener extends PlayerListener
 			}
 			if(plugin.morningReturn)
 			{
-				long time = loadLocation(player).getWorld().getTime();
+				long time = plugin.getServer().getWorlds().get(0).getTime();
 				if(time >=0 && time <= 12000)
 				{
 					player.sendMessage("It is morning, WAKEUP!");
