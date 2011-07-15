@@ -8,6 +8,7 @@ import org.bukkit.event.block.Action;
 //import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -81,7 +82,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
 		Player player = event.getPlayer();
-
+		
 		if (playerDreaming(player))
 		{
 			Boolean tick = tick();
@@ -127,7 +128,7 @@ public class DreamLandPlayerListener extends PlayerListener
 				if(time >=0 && time <= 12000)
 				{
 					player.sendMessage("It is morning, WAKEUP!");
-					leaveDream(player);
+					leaveDream(player); 
 				}
 			}
 		}
@@ -176,6 +177,13 @@ public class DreamLandPlayerListener extends PlayerListener
 		{
     		playerSetSpawn(player);
 		}
+	}
+	
+	public void onPlayerJoin(PlayerJoinEvent event)
+	{
+		Player player = event.getPlayer();
+		plugin.Beds.put(player.getName(), loadLocation(player));
+		//other possible initializers
 	}
 
 	//helper functions
@@ -666,38 +674,32 @@ public class DreamLandPlayerListener extends PlayerListener
 	//saves bed locations of players
 	private Location loadLocation(Player player) 
 	{
-		File save = getBedFile(player);
-		if (!save.exists()) 
+		if(plugin.Beds.containsKey(player.getName()))
 		{
-			return null;
+			return plugin.Beds.get(player.getName());
 		}
-		
-		try 
+		else
 		{
-			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
-			
-			String world = br.readLine();
-			String inputLine = br.readLine();
-			
-			if (inputLine == null || world == null) 
+			File save = getBedFile(player);
+			if (save.exists()) 
 			{
-				return null;
+				try 
+				{
+					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
+					
+					String world = br.readLine();
+					String inputLine = br.readLine();
+					
+					if (inputLine != null && world != null) 
+					{
+						String splits[] = inputLine.replace(',', '.').split(" ", 3);
+						return new Location(plugin.getServer().getWorld(world), Double.parseDouble(splits[0]), Double.parseDouble(splits[1]), Double.parseDouble(splits[2]));
+					}
+				}
+				catch (IOException e) {log.info("There was an issue loading a player's bed location");}
+				catch (java.lang.NumberFormatException e){log.info("There was an loading saving a player's bed location");}
 			}
-			
-			inputLine = inputLine.replace(',', '.');
-			
-			String splits[] = inputLine.split(" ", 3);
-			return new Location(plugin.getServer().getWorld(world), Double.parseDouble(splits[0]), Double.parseDouble(splits[1]), Double.parseDouble(splits[2]));
 		}
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
-		catch (java.lang.NumberFormatException e)
-		{
-			return null;
-		}
-
 		return null;
 	}
 	
@@ -712,12 +714,10 @@ public class DreamLandPlayerListener extends PlayerListener
 			bw.write(String.format("%f %f %f", location.getX(), location.getY(), location.getZ()));
 			bw.close();
 		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+		catch (FileNotFoundException e){log.info("There was an issue saving a player's bed location");}
+		catch (IOException e) {log.info("There was an issue saving a player's bed location");}
+		
+		plugin.Beds.put(player.getName(), location);
 	}
 	
 	private File getBedFile(Player player)

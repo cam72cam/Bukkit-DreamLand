@@ -3,6 +3,7 @@ package me.cmesh.DreamLand;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,6 +26,9 @@ public class DreamLand extends JavaPlugin
 	private final DreamLandPlayerListener playerListener = new DreamLandPlayerListener(this);
 	private final DreamLandEntityListener entityListener = new DreamLandEntityListener(this);
 	public static PermissionHandler Permissions = null;
+	
+	public HashMap<String, Location> Beds = new HashMap<String, Location>();
+	
 	public Boolean anyoneCanGo = true;
 	public Boolean usingpermissions = false;
 	public Integer chance = 1;
@@ -58,6 +62,7 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.High, this);
 
 
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
