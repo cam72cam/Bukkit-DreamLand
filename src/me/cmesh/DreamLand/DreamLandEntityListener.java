@@ -1,8 +1,9 @@
 package me.cmesh.DreamLand;
 
+import org.bukkit.World;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.entity.Player;
 
 public class DreamLandEntityListener extends EntityListener
@@ -24,14 +25,19 @@ public class DreamLandEntityListener extends EntityListener
     		}
 		}
 	}
-	public void onPlayerKick(PlayerKickEvent event)
+	
+	public void onWeatherChange(WeatherChangeEvent event)
 	{
-		//TODO make this only for when moving between worlds
-		if(event.getReason().contains("moved too quickly")) 
+		World world = event.getWorld();
+		if(world.equals(plugin.dreamWorld()))
 		{
 			event.setCancelled(true);
+			world.setStorm(false);
+			world.setThundering(false);
+			world.setWeatherDuration(0);
 		}
 	}
+
 	private Boolean playerInDreamLands(EntityDamageEvent event)
 	{
 		return (plugin.dreamWorld().equals(event.getEntity().getWorld()));

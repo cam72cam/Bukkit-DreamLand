@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
@@ -28,9 +29,8 @@ public class DreamLand extends JavaPlugin
 	public static PermissionHandler Permissions = null;
 	
 	public HashMap<String, Location> Beds = new HashMap<String, Location>();
-	public HashMap<String, Integer> DoubleSpawn = new HashMap<String, Integer>();
+	public HashMap<String, Boolean> Respawn = new HashMap<String, Boolean>();
 	public HashMap<String, Long> Attempt = new HashMap<String, Long>();
-	
 	public Boolean anyoneCanGo = true;
 	public Boolean usingpermissions = false;
 	public Integer chance = 2;
@@ -42,18 +42,16 @@ public class DreamLand extends JavaPlugin
 	public Double flySpeed = 1.0;
 	public Boolean dreamInvincible;
 	public Integer attemptWait = 0;
-	public Boolean message = false;
-	public Boolean teleportOnQuit = false;
+	public String message = "";
 	public String dreamLandWorld = "world_skylands";
 	public String nightmareWorld = "world_nightmare";
 	public Boolean nightmare = true;
 	public Integer nightmareChance = 3;
 	public Boolean morningReturn = true;
-	public Long tick = (long)0;
 	
 	public void onEnable()
 	{ 
-		tick = getServer().getWorlds().get(0).getTime();
+		Respawn.clear();
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
@@ -63,7 +61,8 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.High, this);
-		pm.registerEvent(Event.Type.PLAYER_KICK, entityListener, Event.Priority.High, this);
+		pm.registerEvent(Event.Type.PLAYER_KICK, playerListener, Event.Priority.High, this);
+		pm.registerEvent(Event.Type.WEATHER_CHANGE, entityListener, Event.Priority.High, this);
 
 
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
@@ -88,12 +87,12 @@ public class DreamLand extends JavaPlugin
 		if(nightmare)
 		{
 			getServer().createWorld(nightmareWorld, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
-			nightmareWorld().loadChunk(nightmareWorld().getSpawnLocation().getBlock().getChunk());
+			loadChunk(nightmareWorld().getSpawnLocation());
 		}
 		
 		// Load DreamWorld
 		getServer().createWorld(dreamLandWorld,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
-		dreamWorld().loadChunk(dreamWorld().getSpawnLocation().getBlock().getChunk());
+		loadChunk(dreamWorld().getSpawnLocation());
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
@@ -102,9 +101,8 @@ public class DreamLand extends JavaPlugin
 		{
 			if (sender instanceof Player) 
 			{
-
 				Player player = (Player)sender;
-				if(playerListener.playerDreaming(player))
+				if(playerListener.playerDreaming(player) && checkPermissions(player, "dreamland.setdreamspawn", true))
 				{
 					Location location = player.getLocation();
 					player.getWorld().setSpawnLocation((int)location.getX(), (int)location.getY(), (int)location.getZ());
@@ -121,9 +119,9 @@ public class DreamLand extends JavaPlugin
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is disabled!");
 	}
 
-	public boolean checkpermissions(Player player, String string, Boolean standard)
+	public boolean checkPermissions(Player player, String string, Boolean standard)
 	{
-		return (anyoneCanGo || (player.isOp() == true) || (usingpermissions ? Permissions.has(player,string) : standard));
+		return (player.isOp() == true) || (usingpermissions ? Permissions.has(player,string) : standard);
 	}
 	
 	public void reload()
@@ -144,7 +142,7 @@ public class DreamLand extends JavaPlugin
 		attemptWait = getConfiguration().getInt("dreamland.attemptWait", 0);
 		attemptWait *= 30;
 		
-		message = getConfiguration().getBoolean("dreamland.message", false);
+		message = getConfiguration().getString("dreamland.message", "");
 		
 		seperateInv = getConfiguration().getBoolean("dreamland.seperateInventories", false  );
 		seperateInvInitial = getConfiguration().getBoolean("dreamland.seperateInitialInventories", true);
@@ -158,7 +156,6 @@ public class DreamLand extends JavaPlugin
 		createFile(messageFile);
 		
 		flyTool = Arrays.asList(getConfiguration().getString("dreamland.flytool","288").split(","));
-		teleportOnQuit = getConfiguration().getBoolean("dreamland.teleportOnQuit", false);
 		getConfiguration().save();
 		
 		
@@ -176,7 +173,13 @@ public class DreamLand extends JavaPlugin
 	{
 		return getServer().getWorld(nightmareWorld);
 	}
-
+	
+	public void loadChunk(Location location)
+	{
+		Chunk chunk = location.getBlock().getChunk();
+		location.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
+	}
+	
 	public static boolean deleteDir(File dir)
 	{
 		if (dir.isDirectory())
