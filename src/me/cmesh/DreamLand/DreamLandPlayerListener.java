@@ -69,7 +69,7 @@ public class DreamLandPlayerListener extends PlayerListener
 						{
 						
 							Vector dir = player.getLocation().getDirection().multiply(plugin.flySpeed);
-							dir.setY(0.75);
+							dir.setY(dir.getY()+0.50);
 							player.setVelocity(dir);
 							player.setFallDistance(0);
 						}
@@ -90,10 +90,9 @@ public class DreamLandPlayerListener extends PlayerListener
 				leaveDream(player);
 				return;
 			}
-			if(plugin.Respawn.get(player.getName()))
+			if(respawn(player))
 			{
 				player.teleport(player.getWorld().getSpawnLocation());
-				plugin.Respawn.put(player.getName(), false);
 			}
 			if(playerInNightmare(player))
 	    	{
@@ -111,14 +110,13 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 		else
 		{
-			if(plugin.Respawn.get(player.getName()))
+			if(respawn(player))
 			{
 				player.teleport(checkBedSpawnLoc(loadBed(player)));
 				if(plugin.seperateInv)
 				{
 					loadPlayerInv(player, player.getWorld());
 				}
-				plugin.Respawn.put(player.getName(), false);
 			}
 		}
 	}
@@ -132,7 +130,13 @@ public class DreamLandPlayerListener extends PlayerListener
 			{
 				if ((plugin.attemptWait == 0 || getWait(player)) && new Random().nextInt(plugin.chance) == 0)
 				{
-					enterDream(player, event.getBed().getLocation(), new Random().nextInt(plugin.nightmareChance) == 0);
+					Boolean nightmare = false;
+					if(plugin.nightmare)
+					{
+						nightmare = new Random().nextInt(plugin.nightmareChance) == 0;
+					}
+					
+					enterDream(player, event.getBed().getLocation(),nightmare);
 					plugin.Attempt.put(player.getName(), new Long(0));
 	    		}
 				else
@@ -161,7 +165,7 @@ public class DreamLandPlayerListener extends PlayerListener
     	if (playerDreaming(player))
 		{
     		log.info("respawn set");
-    		plugin.Respawn.put(player.getName(), true);
+    		plugin.Respawn.put(player.getName(), 2);
 		}
 	}
 
@@ -180,7 +184,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		if(!plugin.Attempt.containsKey(player.getName()))
 		{
 			plugin.Attempt.put(player.getName(), new Long(0));
-			plugin.Respawn.put(player.getName(), false);
+			plugin.Respawn.put(player.getName(), 0);
 		}
 	}
 
@@ -220,9 +224,11 @@ public class DreamLandPlayerListener extends PlayerListener
 		
 		player.teleport(loc);
 		
-		plugin.Respawn.put(player.getName(), true);
-
-    	player.sendMessage(plugin.message);
+		plugin.Respawn.put(player.getName(), 2);
+		if(!plugin.message.isEmpty())
+		{
+			player.sendMessage(plugin.message);
+		}
     	log.info(player.getName() + " went to Dream Land");
     	return;
     }
@@ -262,6 +268,17 @@ public class DreamLandPlayerListener extends PlayerListener
    		}
 	}
 
+	private Boolean respawn(Player player)
+	{
+		int value = plugin.Respawn.get(player.getName());
+		if(value > 0)
+		{
+			plugin.Respawn.put(player.getName(), value-1);
+			return true;
+		}
+		return false;
+	}
+	
     //health
     private File playerHealthFile(Player player)
     {

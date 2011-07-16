@@ -13,8 +13,6 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.weather.WeatherChangeEvent;
-import org.bukkit.event.weather.WeatherListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -32,8 +30,9 @@ public class DreamLand extends JavaPlugin
 	public static PermissionHandler Permissions = null;
 	
 	public HashMap<String, Location> Beds = new HashMap<String, Location>();
-	public HashMap<String, Boolean> Respawn = new HashMap<String, Boolean>();
+	public HashMap<String, Integer> Respawn = new HashMap<String, Integer>();
 	public HashMap<String, Long> Attempt = new HashMap<String, Long>();
+	
 	public Boolean anyoneCanGo = true;
 	public Boolean usingpermissions = false;
 	public Integer chance = 2;
