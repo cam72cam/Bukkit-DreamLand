@@ -13,6 +13,8 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.event.weather.WeatherListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -26,6 +28,7 @@ public class DreamLand extends JavaPlugin
 	public static final Logger log = Logger.getLogger("Minecraft");
 	private final DreamLandPlayerListener playerListener = new DreamLandPlayerListener(this);
 	private final DreamLandEntityListener entityListener = new DreamLandEntityListener(this);
+	private final DreamLandWeatherListener weatherListener = new DreamLandWeatherListener(this);
 	public static PermissionHandler Permissions = null;
 	
 	public HashMap<String, Location> Beds = new HashMap<String, Location>();
@@ -62,7 +65,7 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.High, this);
 		pm.registerEvent(Event.Type.PLAYER_KICK, playerListener, Event.Priority.High, this);
-		pm.registerEvent(Event.Type.WEATHER_CHANGE, entityListener, Event.Priority.High, this);
+		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.High, this);
 
 
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
