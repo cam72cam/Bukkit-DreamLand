@@ -63,11 +63,10 @@ public class DreamLandPlayerListener extends PlayerListener
 			{
 				if (playerInDreamLand(player))
 				{
-					if (plugin.flyTool.contains("-1") || plugin.flyTool.contains(Integer.toString(event.getPlayer().getItemInHand().getTypeId())))
+					if (plugin.flyTool.equals("-1") || plugin.flyTool.equals(Integer.toString(event.getPlayer().getItemInHand().getTypeId())))
 					{
 						if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
 						{
-						
 							Vector dir = player.getLocation().getDirection().multiply(plugin.flySpeed);
 							dir.setY(dir.getY()+0.50);
 							player.setVelocity(dir);
@@ -88,6 +87,7 @@ public class DreamLandPlayerListener extends PlayerListener
 			if (event.getTo().getY() < 0)
 			{
 				leaveDream(player);
+				log.info(player.getName() + " woke up");
 				return;
 			}
 			if(respawn(player))
@@ -95,15 +95,16 @@ public class DreamLandPlayerListener extends PlayerListener
 				player.teleport(player.getWorld().getSpawnLocation());
 			}
 			if(playerInNightmare(player))
-	    	{
-	    		player.setFireTicks(3*30);
-	    	}
+			{
+				player.setFireTicks(3*30);
+			}
 			if(plugin.morningReturn)
 			{
 				long time = loadBed(player).getWorld().getTime();
 				if(time >=0 && time <= 12000)
 				{
 					player.sendMessage("It is morning, WAKEUP!");
+					log.info(player.getName() + " woke up");
 					leaveDream(player); 
 				}
 			}
@@ -112,11 +113,12 @@ public class DreamLandPlayerListener extends PlayerListener
 		{
 			if(respawn(player))
 			{
-				player.teleport(checkBedSpawnLoc(loadBed(player)));
+				player.teleport(checkSpawnLoc(loadBed(player)));
 				if(plugin.seperateInv)
 				{
 					loadPlayerInv(player, player.getWorld());
 				}
+				log.info(player.getName() + " woke up");
 			}
 		}
 	}
@@ -128,17 +130,15 @@ public class DreamLandPlayerListener extends PlayerListener
 		{
 			if(!playerDreaming(player))
 			{
-				if ((plugin.attemptWait == 0 || getWait(player)) && new Random().nextInt(plugin.chance) == 0)
+				if ((plugin.attemptWait == 0 || getWait(player)) && new Random().nextInt(100) < plugin.dreamChance)
 				{
-					Boolean nightmare = false;
-					if(plugin.nightmare)
-					{
-						nightmare = new Random().nextInt(plugin.nightmareChance) == 0;
-					}
+					event.setCancelled(true);
+					
+					Boolean nightmare = (plugin.nightmareChance != 0) && new Random().nextInt(100) < plugin.nightmareChance;
 					
 					enterDream(player, event.getBed().getLocation(),nightmare);
 					plugin.Attempt.put(player.getName(), new Long(0));
-	    		}
+				}
 				else
 				{
 					if(getWait(player))
@@ -147,25 +147,25 @@ public class DreamLandPlayerListener extends PlayerListener
 					}
 				}
 			}
-    	}
-    }
+		}
+	}
 	
 	public void onPlayerQuit(PlayerQuitEvent event)
 	{
-    	Player player = event.getPlayer();
-    	if (playerDreaming(player))
+		Player player = event.getPlayer();
+		if (playerDreaming(player))
 		{
-    		leaveDream(player);
+			leaveDream(player);
+			log.info(player.getName() + " woke up");
 		}
 	}
 
 	public void onPlayerRespawn(PlayerRespawnEvent event)
 	{
 		Player player = event.getPlayer();
-    	if (playerDreaming(player))
+		if (playerDreaming(player))
 		{
-    		log.info("respawn set");
-    		plugin.Respawn.put(player.getName(), 2);
+			plugin.Respawn.put(player.getName(), 2);
 		}
 	}
 
@@ -182,17 +182,16 @@ public class DreamLandPlayerListener extends PlayerListener
 	{
 		Player player = event.getPlayer();
 		if(!plugin.Attempt.containsKey(player.getName()))
-		{
 			plugin.Attempt.put(player.getName(), new Long(0));
+		if(!plugin.Respawn.containsKey(player.getName()))
 			plugin.Respawn.put(player.getName(), 0);
-		}
 	}
 
 	
 	//helper functions
 	public Boolean playerDreaming(Player player)
 	{
-		return playerInDreamLand(player) || (playerInNightmare(player) && plugin.nightmare);
+		return playerInDreamLand(player) || (playerInNightmare(player) && plugin.nightmareChance != 0);
 	}
 	
 	private Boolean playerInDreamLand(Player player)
@@ -205,8 +204,8 @@ public class DreamLandPlayerListener extends PlayerListener
 		return player.getWorld().equals(plugin.nightmareWorld());
 	}
 
-    private void enterDream(Player player, Location bed, Boolean nightmare)
-    {
+	private void enterDream(Player player, Location bed, Boolean nightmare)
+	{
 		saveBed(player, bed);
 		savePlayerHealth(player);
 		
@@ -216,29 +215,35 @@ public class DreamLandPlayerListener extends PlayerListener
 			loc = plugin.nightmareWorld().getSpawnLocation();
 		}
 		
+		loc = checkSpawnLoc(loc);
+		
 		if(plugin.seperateInv)
 		{
 			savePlayerInv(player, player.getWorld());
-			loadPlayerInv(player, loc.getWorld());
 		}
 		
 		player.teleport(loc);
+		
+		if(plugin.seperateInv)
+		{
+			loadPlayerInv(player, player.getWorld());
+		}
 		
 		plugin.Respawn.put(player.getName(), 2);
 		if(!plugin.message.isEmpty())
 		{
 			player.sendMessage(plugin.message);
 		}
-    	log.info(player.getName() + " went to Dream Land");
-    	return;
-    }
+		log.info(player.getName() + " is dreaming");
+		return;
+	}
  
-    private void leaveDream(Player player)
-    {
-    	player.setFireTicks(0);
-    	Location loc = loadBed(player);
+	private void leaveDream(Player player)
+	{
+		player.setFireTicks(0);
+		Location loc = loadBed(player);
 		plugin.loadChunk(loc);
-    	
+
 		if(plugin.seperateInv)
 		{
 			savePlayerInv(player, player.getWorld());
@@ -246,12 +251,11 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 
 		player.setFallDistance(0);
-		player.teleport(checkBedSpawnLoc(loc));
+		player.teleport(checkSpawnLoc(loc));
 		player.setFallDistance(0);
 		
-		log.info(player.getName() + " left DreamLand");
 		loadPlayerHealth(player);
-    }
+	}
 
 	private Boolean getWait(Player player)
 	{
@@ -279,20 +283,20 @@ public class DreamLandPlayerListener extends PlayerListener
 		return false;
 	}
 	
-    //health
-    private File playerHealthFile(Player player)
-    {
-    	File healthFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Health");
+	//health
+	private File playerHealthFile(Player player)
+	{
+		File healthFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Health");
 		if (!healthFolder.exists()) 
 		{
 			healthFolder.mkdir();
 		}
 		return new File(healthFolder + File.separator + player.getName());
-    }
-    
-    private void savePlayerHealth(Player player)
-    {
-    	BufferedWriter bw;
+	}
+	
+	private void savePlayerHealth(Player player)
+	{
+		BufferedWriter bw;
 		try 
 		{
 			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(playerHealthFile(player))));
@@ -301,11 +305,11 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 		catch (FileNotFoundException e) {}
 		catch (IOException e) {}
-    }
-    
-    private void loadPlayerHealth(Player player)
-    {
-    	File save = playerHealthFile(player);
+	}
+	
+	private void loadPlayerHealth(Player player)
+	{
+		File save = playerHealthFile(player);
 		if (save.exists()) 
 		{
 			try 
@@ -319,8 +323,8 @@ public class DreamLandPlayerListener extends PlayerListener
 			catch (java.lang.IllegalArgumentException e){}
 		}
 		return;
-    }
-    
+	}
+	
 	//Inventory store/switcher
 	private File playerInv(Player player, World world)
 	{
@@ -366,7 +370,6 @@ public class DreamLandPlayerListener extends PlayerListener
 		for(String item : inv)
 		{
 			String [] split = item.split(" ", 4);
-			
 			int spot = Integer.parseInt(split[0]);
 			int itemId = Integer.parseInt(split[1]);
 			int ammount = Integer.parseInt(split[2]);
@@ -392,27 +395,11 @@ public class DreamLandPlayerListener extends PlayerListener
 		{
 			if (!save.exists()) 
 			{
-				if(plugin.kit && playerInDreamLand(player))
+				if(playerInDreamLand(player) && plugin.kit.size() != 0)
 				{
 					player.getInventory().clear();
-					save = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "kit.txt");
-					if (save.exists()) 
-					{
-						BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
-						
-						List<String> inv = new ArrayList<String>();
-						String inputLine = br.readLine();
-						
-						int count =0;
-						while (inputLine != null)
-						{
-							inv.add(count + " " + inputLine + " 0");
-							inputLine = br.readLine();
-							count++;
-						}
-						stringToInv(player, inv);
-						player.updateInventory();
-					}
+					stringToInv(player, plugin.kit);
+					player.updateInventory();
 					return;
 				}
 				if(plugin.seperateInvInitial)
@@ -422,7 +409,6 @@ public class DreamLandPlayerListener extends PlayerListener
 				}
 				return;
 			}
-		
 			player.getInventory().clear();
 			
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
@@ -504,11 +490,11 @@ public class DreamLandPlayerListener extends PlayerListener
 	}
 
 	
-	public Location checkBedSpawnLoc(Location location)
+	public Location checkSpawnLoc(Location location)
 	{
 		Block block = location.getBlock();
 		Block blockCheck = null;
-		double spawnoffset = 0.5;
+		double spawnoffset = 0.0;
 		
 		if (block.getRelative(BlockFace.NORTH).getType() == Material.AIR) 
 		{

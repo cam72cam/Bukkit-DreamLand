@@ -1,7 +1,6 @@
 package me.cmesh.DreamLand;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,36 +34,41 @@ public class DreamLand extends JavaPlugin
 	
 	public Boolean anyoneCanGo = true;
 	public Boolean usingpermissions = false;
-	public Integer chance = 2;
+	public Integer dreamChance = 100;
 	public Boolean dreamFly = true;
-	public List<String> flyTool = Arrays.asList("288");
+	public String flyTool = "288";
 	public Boolean seperateInv = false;
 	public Boolean seperateInvInitial = true;
-	public Boolean kit = false;
+	public List<String> kit = Arrays.asList("0 288 1 0");
 	public Double flySpeed = 1.0;
 	public Boolean dreamInvincible;
 	public Integer attemptWait = 0;
 	public String message = "";
-	public String dreamLandWorld = "world_skylands";
+	public String dreamWorld = "world_skylands";
 	public String nightmareWorld = "world_nightmare";
-	public Boolean nightmare = true;
-	public Integer nightmareChance = 3;
+	public Integer nightmareChance = 50;
 	public Boolean morningReturn = true;
 	
 	public void onEnable()
 	{ 
 		Respawn.clear();
 		PluginManager pm = getServer().getPluginManager();
+
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
+		
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_BED_ENTER, playerListener, Event.Priority.High, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.High, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.High, this);
 		pm.registerEvent(Event.Type.PLAYER_KICK, playerListener, Event.Priority.High, this);
+		
 		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.High, this);
+		pm.registerEvent(Event.Type.THUNDER_CHANGE, weatherListener, Event.Priority.High, this);
+		pm.registerEvent(Event.Type.LIGHTNING_STRIKE, weatherListener, Event.Priority.High, this);
+		
 
 
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
@@ -86,14 +90,14 @@ public class DreamLand extends JavaPlugin
 		reload();
 		
 		// Load Nightmare world
-		if(nightmare)
+		if(nightmareChance != 0)
 		{
 			getServer().createWorld(nightmareWorld, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
 			loadChunk(nightmareWorld().getSpawnLocation());
 		}
 		
 		// Load DreamWorld
-		getServer().createWorld(dreamLandWorld,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
+		getServer().createWorld(dreamWorld,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
 		loadChunk(dreamWorld().getSpawnLocation());
 	}
 
@@ -129,47 +133,51 @@ public class DreamLand extends JavaPlugin
 	public void reload()
 	{
 		getConfiguration().load();
-		dreamLandWorld = getConfiguration().getString("dreamland.dreamWorld",getServer().getWorlds().get(0).getName()+"_skylands");
-		nightmareWorld = getConfiguration().getString("dreamland.nightmareWorld",getServer().getWorlds().get(0).getName()+"_nightmare");
-		nightmare = getConfiguration().getBoolean("dreamland.haveNightmare", true);
+		
+		dreamWorld = getConfiguration().getString("dreamland.worlds.dream",getServer().getWorlds().get(0).getName()+"_skylands");
+		nightmareWorld = getConfiguration().getString("dreamland.worlds.nightmare",getServer().getWorlds().get(0).getName()+"_nightmare");
 
-		chance = getConfiguration().getInt("dreamland.chance",1);
-		nightmareChance = getConfiguration().getInt("dreamland.nightmareChance",3);
+		dreamChance = getConfiguration().getInt("dreamland.chance.dream",100);
+		nightmareChance = getConfiguration().getInt("dreamland.chance.nightmare",50);
 		
-		morningReturn = getConfiguration().getBoolean("dreamland.morningReturn", true);
-		anyoneCanGo = getConfiguration().getBoolean("dreamland.allowAll",true);
-		dreamInvincible = getConfiguration().getBoolean("dreamland.dreamInvincible", true);
-		dreamFly = getConfiguration().getBoolean("dreamland.fly",true);
-		flySpeed = getConfiguration().getDouble("dreamland.flySpeed", 1.0);
-		attemptWait = getConfiguration().getInt("dreamland.attemptWait", 0);
-		attemptWait *= 30;
+		//options
+		anyoneCanGo = getConfiguration().getBoolean("dreamland.options.allowAll",true);
+		attemptWait = getConfiguration().getInt("dreamland.options.attemptWait", 0);
+		attemptWait *= 30;		
+		message = getConfiguration().getString("dreamland.options.message", "");
+		morningReturn = getConfiguration().getBoolean("dreamland.options.wakeup", true);
+		dreamInvincible = getConfiguration().getBoolean("dreamland.options.invincible", true);
 		
-		message = getConfiguration().getString("dreamland.message", "");
+		//fly
+		dreamFly = getConfiguration().getBoolean("dreamland.fly.enable",true);
+		flySpeed = getConfiguration().getDouble("dreamland.fly.speed", 1.0);
+		flyTool = getConfiguration().getString("dreamland.fly.tool","288");
 		
-		seperateInv = getConfiguration().getBoolean("dreamland.seperateInventories", false  );
-		seperateInvInitial = getConfiguration().getBoolean("dreamland.seperateInitialInventories", true);
+		//inventory
+		seperateInv = getConfiguration().getBoolean("dreamland.inventory.seperate", true  );
+		seperateInvInitial = getConfiguration().getBoolean("dreamland.inventory.seperateInitial", true);
 		
-		kit = getConfiguration().getBoolean("dreamland.kit", false);
+		List<String> kitTemp = Arrays.asList(
+				getConfiguration().getString("dreamland.inventory.kit.1", "288 1"),
+				getConfiguration().getString("dreamland.inventory.kit.2", ""),
+				getConfiguration().getString("dreamland.inventory.kit.3", "")
+				);
 		
-		File kitFile = new File(getDataFolder().getAbsolutePath() + File.separator + "kit.txt");
-		createFile(kitFile);
+		int count =0;
+		kit = new ArrayList<String>();
+		for(String item : kitTemp)
+		{
+			if(!item.equals(""))
+				kit.add(count + " " + item + " 0");
+			count ++;
+		}
 		
-		File messageFile = new File(getDataFolder().getAbsolutePath() + File.separator + "message.txt");
-		createFile(messageFile);
-		
-		flyTool = Arrays.asList(getConfiguration().getString("dreamland.flytool","288").split(","));
 		getConfiguration().save();
-		
-		
-		File lock =  new File(getDataFolder().getAbsolutePath() + File.separator + "Lock");
-		deleteDir(lock);
-		File attempts =  new File(getDataFolder().getAbsolutePath() + File.separator + "Attempts");
-		deleteDir(attempts);
 	}
 
 	public World dreamWorld()
 	{
-		return getServer().getWorld(dreamLandWorld);
+		return getServer().getWorld(dreamWorld);
 	}
 	public World nightmareWorld()
 	{
@@ -180,37 +188,5 @@ public class DreamLand extends JavaPlugin
 	{
 		Chunk chunk = location.getBlock().getChunk();
 		location.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
-	}
-	
-	public static boolean deleteDir(File dir)
-	{
-		if (dir.isDirectory())
-		{
-			String[] children = dir.list();
-			for (int i=0; i<children.length; i++)
-			{
-				boolean success = deleteDir(new File(dir, children[i]));
-				if (!success) {
-					return false;
-				}
-			}
-		}
-		return dir.delete();
-	}
-
-	public static void createFile(File file)
-	{
-		if(file.exists())
-		{
-			return;
-		}
-		try 
-		{
-			file.createNewFile();
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
 	}
 }

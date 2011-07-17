@@ -1,6 +1,7 @@
 package me.cmesh.DreamLand;
 
-import org.bukkit.World;
+import org.bukkit.event.weather.LightningStrikeEvent;
+import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.weather.WeatherListener;
 
@@ -13,15 +14,27 @@ public class DreamLandWeatherListener extends WeatherListener
 		plugin = instance;
 	}
 	
-	public void onWeatherChange(WeatherChangeEvent event)
+	public void onWeatherChange( WeatherChangeEvent event )
 	{
-		World world = event.getWorld();
-		if(world.equals(plugin.dreamWorld()))
+		if( !event.isCancelled() && event.toWeatherState() && event.getWorld().equals(plugin.dreamWorld()) )
 		{
-			event.setCancelled(true);
-			world.setStorm(false);
-			world.setThundering(false);
-			world.setWeatherDuration(0);
+			event.setCancelled( true );
+		}
+	}
+
+	public void onThunderChange( ThunderChangeEvent event )
+	{
+		if( !event.isCancelled() && event.toThunderState() && event.getWorld().equals(plugin.dreamWorld()) )
+		{
+			event.setCancelled( true );
+		}
+	}
+
+	public void onLightningStrike( LightningStrikeEvent event )
+	{
+		if(!event.isCancelled() && event.getWorld().equals(plugin.dreamWorld()) )
+		{
+			event.setCancelled( true );
 		}
 	}
 }
