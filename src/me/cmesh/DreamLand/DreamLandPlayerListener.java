@@ -457,6 +457,7 @@ public class DreamLandPlayerListener extends PlayerListener
 			catch (IOException e) {log.info("There was an issue loading a player's bed location");}
 			catch (java.lang.NumberFormatException e){log.info("There was an loading saving a player's bed location");}
 		}
+                // This now returns null, but needs to return the default world spawn location.
 		return null;
 	}
 	
