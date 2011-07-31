@@ -26,15 +26,15 @@ public class DreamLand extends JavaPlugin
 	private final DreamLandEntityListener entityListener = new DreamLandEntityListener(this);
 	private final DreamLandWeatherListener weatherListener = new DreamLandWeatherListener(this);
 	
-	public DreamLandWorldSetting nightmare = new DreamLandWorldSetting(this);
-	public DreamLandWorldSetting dream = new DreamLandWorldSetting(this);
-	public DreamLandWorldSetting base = new DreamLandWorldSetting(this);
+	public DreamLandWorld nightmare = new DreamLandWorld(this);
+	public DreamLandWorld dream = new DreamLandWorld(this);
+	public DreamLandWorld base = new DreamLandWorld(this);
 	
 	public static PermissionHandler Permissions = null;
 	
 	public Boolean anyoneCanGo = true;
 	public Boolean usingpermissions = false;
-	public String flyTool = "288";
+	public Integer flyTool = 288;
 	public List<String> kit = new ArrayList<String>();
 	public Double flySpeed = 1.0;
 	public Integer attemptWait = 0;
@@ -42,7 +42,7 @@ public class DreamLand extends JavaPlugin
 	public Boolean morningReturn = true;
 	
 	
-	private HashMap<String, DreamLandPlayerSetting> Players= new HashMap<String, DreamLandPlayerSetting>(); 
+	private HashMap<String, DreamLandPlayer> Players= new HashMap<String, DreamLandPlayer>(); 
 	
 	
 	public void onEnable()
@@ -64,24 +64,12 @@ public class DreamLand extends JavaPlugin
 		pm.registerEvent(Event.Type.THUNDER_CHANGE, weatherListener, Event.Priority.High, this);
 		pm.registerEvent(Event.Type.LIGHTNING_STRIKE, weatherListener, Event.Priority.High, this);
 		
-
-
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
 		if (Permissions == null)
 		{
-			if (permissions != null)
-			{
-				Permissions = ((Permissions)permissions).getHandler();
-				log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled with permissions!");
-				usingpermissions = true;
-			}
-			else
-			{
-				log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled without permissions!");
-				usingpermissions = false;
-			}
+			Permissions = (permissions != null) ? ((Permissions)permissions).getHandler() : null;
 		}
-
+		
 		reload();
 		
 		// Load Nightmare world
@@ -94,6 +82,8 @@ public class DreamLand extends JavaPlugin
 		// Load DreamWorld
 		getServer().createWorld(dream.World,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
 		loadChunk(dream.GetWorld().getSpawnLocation());
+		
+		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled!");
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
@@ -103,7 +93,7 @@ public class DreamLand extends JavaPlugin
 			if (sender instanceof Player) 
 			{
 				Player player = (Player)sender;
-				DreamLandPlayerSetting playerInfo = getPlayer(player);
+				DreamLandPlayer playerInfo = getPlayer(player);
 				if(playerInfo.Dreaming() && checkPermissions(player, "dreamland.setdreamspawn", true))
 				{
 					Location location = player.getLocation();
@@ -158,7 +148,7 @@ public class DreamLand extends JavaPlugin
 		
 		//fly
 		flySpeed = getConfiguration().getDouble("dreamland.fly.speed", 1.0);
-		flyTool = getConfiguration().getString("dreamland.fly.tool","288");
+		flyTool = getConfiguration().getInt("dreamland.fly.tool",288);
 		
 		//inventory
 		for(String node : getConfiguration().getKeys("dreamland.inventory.kit"))
@@ -169,7 +159,7 @@ public class DreamLand extends JavaPlugin
 		getConfiguration().save();
 	}
 	
-	public DreamLandWorldSetting GetSetting(World world)
+	public DreamLandWorld getSetting(World world)
 	{
 		if(world.equals(dream.GetWorld()))
 		{
@@ -191,10 +181,10 @@ public class DreamLand extends JavaPlugin
 	
 	public void createPlayer(Player player)
 	{
-		Players.put(player.getName(), new DreamLandPlayerSetting(this).Update(player));
+		Players.put(player.getName(), new DreamLandPlayer(this).Update(player));
 	}
 	
-	public DreamLandPlayerSetting getPlayer(Player player)
+	public DreamLandPlayer getPlayer(Player player)
 	{
 		String key = player.getName();
 		if(Players.containsKey(key))
@@ -205,5 +195,4 @@ public class DreamLand extends JavaPlugin
 		createPlayer(player);
 		return getPlayer(player);
 	}
-	
 }
