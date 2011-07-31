@@ -1,7 +1,6 @@
 package me.cmesh.DreamLand;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -26,32 +25,28 @@ public class DreamLand extends JavaPlugin
 	private final DreamLandPlayerListener playerListener = new DreamLandPlayerListener(this);
 	private final DreamLandEntityListener entityListener = new DreamLandEntityListener(this);
 	private final DreamLandWeatherListener weatherListener = new DreamLandWeatherListener(this);
-	public static PermissionHandler Permissions = null;
 	
-	public HashMap<String, Location> Beds = new HashMap<String, Location>();
-	public HashMap<String, Integer> Respawn = new HashMap<String, Integer>();
-	public HashMap<String, Long> Attempt = new HashMap<String, Long>();
+	public DreamLandWorldSetting nightmare = new DreamLandWorldSetting(this);
+	public DreamLandWorldSetting dream = new DreamLandWorldSetting(this);
+	public DreamLandWorldSetting base = new DreamLandWorldSetting(this);
+	
+	public static PermissionHandler Permissions = null;
 	
 	public Boolean anyoneCanGo = true;
 	public Boolean usingpermissions = false;
-	public Integer dreamChance = 100;
-	public Boolean dreamFly = true;
 	public String flyTool = "288";
-	public Boolean seperateInv = false;
-	public Boolean seperateInvInitial = true;
-	public List<String> kit = Arrays.asList("0 288 1 0");
+	public List<String> kit = new ArrayList<String>();
 	public Double flySpeed = 1.0;
-	public Boolean dreamInvincible;
 	public Integer attemptWait = 0;
 	public String message = "";
-	public String dreamWorld = "world_skylands";
-	public String nightmareWorld = "world_nightmare";
-	public Integer nightmareChance = 50;
 	public Boolean morningReturn = true;
+	
+	
+	private HashMap<String, DreamLandPlayerSetting> Players= new HashMap<String, DreamLandPlayerSetting>(); 
+	
 	
 	public void onEnable()
 	{ 
-		Respawn.clear();
 		PluginManager pm = getServer().getPluginManager();
 
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Normal, this);
@@ -90,15 +85,15 @@ public class DreamLand extends JavaPlugin
 		reload();
 		
 		// Load Nightmare world
-		if(nightmareChance != 0)
+		if(nightmare.Chance != 0)
 		{
-			getServer().createWorld(nightmareWorld, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
-			loadChunk(nightmareWorld().getSpawnLocation());
+			getServer().createWorld(nightmare.World, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
+			loadChunk(nightmare.GetWorld().getSpawnLocation());
 		}
 		
 		// Load DreamWorld
-		getServer().createWorld(dreamWorld,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
-		loadChunk(dreamWorld().getSpawnLocation());
+		getServer().createWorld(dream.World,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
+		loadChunk(dream.GetWorld().getSpawnLocation());
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
@@ -108,7 +103,8 @@ public class DreamLand extends JavaPlugin
 			if (sender instanceof Player) 
 			{
 				Player player = (Player)sender;
-				if(playerListener.playerDreaming(player) && checkPermissions(player, "dreamland.setdreamspawn", true))
+				DreamLandPlayerSetting playerInfo = getPlayer(player);
+				if(playerInfo.Dreaming() && checkPermissions(player, "dreamland.setdreamspawn", true))
 				{
 					Location location = player.getLocation();
 					player.getWorld().setSpawnLocation((int)location.getX(), (int)location.getY(), (int)location.getZ());
@@ -125,68 +121,89 @@ public class DreamLand extends JavaPlugin
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is disabled!");
 	}
 
-	public boolean checkPermissions(Player player, String string, Boolean standard)
+	public boolean checkPermissions(Player player, String permission, Boolean standard)
 	{
-		return (player.isOp() == true) || (usingpermissions ? Permissions.has(player,string) : standard);
+		return (player.isOp() == true) || player.hasPermission(permission) || (usingpermissions ? Permissions.has(player,permission) : standard);
 	}
 	
 	public void reload()
 	{
 		getConfiguration().load();
 		
-		dreamWorld = getConfiguration().getString("dreamland.worlds.dream",getServer().getWorlds().get(0).getName()+"_skylands");
-		nightmareWorld = getConfiguration().getString("dreamland.worlds.nightmare",getServer().getWorlds().get(0).getName()+"_nightmare");
-
-		dreamChance = getConfiguration().getInt("dreamland.chance.dream",100);
-		nightmareChance = getConfiguration().getInt("dreamland.chance.nightmare",50);
+		dream.World = getConfiguration().getString("dreamland.worlds.dream.name",getServer().getWorlds().get(0).getName()+"_skylands");
+		dream.PersistInventory = getConfiguration().getBoolean("dreamland.worlds.dream.persistInventory",true);
+		dream.InitialInventoryClear = getConfiguration().getBoolean("dreamland.worlds.dream.clearInitialInventory", true);
+		dream.Invincible = getConfiguration().getBoolean("dreamland.worlds.dream.invincible", true);
+		dream.Fly = getConfiguration().getBoolean("dreamland.worlds.dream.fly", true);
+		dream.Flaming = getConfiguration().getBoolean("dreamland.worlds.dream.flaming", false);
+		dream.Kit = getConfiguration().getBoolean("dreamland.worlds.dream.kit", true);
+		dream.Chance = getConfiguration().getInt("dreamland.chance.dream",100);
+		
+		nightmare.World = getConfiguration().getString("dreamland.worlds.nightmare.name",getServer().getWorlds().get(0).getName()+"_nightmare");
+		nightmare.PersistInventory = getConfiguration().getBoolean("dreamland.worlds.nightmare.persistInventory",false);
+		nightmare.InitialInventoryClear = getConfiguration().getBoolean("dreamland.worlds.nightmare.clearInitialInventory", true);
+		nightmare.Invincible = getConfiguration().getBoolean("dreamland.worlds.nightmare.invincible", false);
+		nightmare.Fly = getConfiguration().getBoolean("dreamland.worlds.nightmare.fly", false);
+		nightmare.Flaming = getConfiguration().getBoolean("dreamland.worlds.nightmare.flaming", true);
+		nightmare.Kit = getConfiguration().getBoolean("dreamland.worlds.nightmare.kit", false);
+		nightmare.Chance = getConfiguration().getInt("dreamland.chance.nightmare",50);
+		
+		base.PersistInventory = getConfiguration().getBoolean("dreamland.worlds.default.persistInventory",true);
 		
 		//options
 		anyoneCanGo = getConfiguration().getBoolean("dreamland.options.allowAll",true);
-		attemptWait = getConfiguration().getInt("dreamland.options.attemptWait", 0);
-		attemptWait *= 30;		
+		attemptWait = getConfiguration().getInt("dreamland.options.attemptWait", 0) * 30;
 		message = getConfiguration().getString("dreamland.options.message", "");
 		morningReturn = getConfiguration().getBoolean("dreamland.options.wakeup", true);
-		dreamInvincible = getConfiguration().getBoolean("dreamland.options.invincible", true);
 		
 		//fly
-		dreamFly = getConfiguration().getBoolean("dreamland.fly.enable",true);
 		flySpeed = getConfiguration().getDouble("dreamland.fly.speed", 1.0);
 		flyTool = getConfiguration().getString("dreamland.fly.tool","288");
 		
 		//inventory
-		seperateInv = getConfiguration().getBoolean("dreamland.inventory.seperate", true  );
-		seperateInvInitial = getConfiguration().getBoolean("dreamland.inventory.seperateInitial", true);
-		
-		List<String> kitTemp = Arrays.asList(
-				getConfiguration().getString("dreamland.inventory.kit.1", "288 1"),
-				getConfiguration().getString("dreamland.inventory.kit.2", ""),
-				getConfiguration().getString("dreamland.inventory.kit.3", "")
-				);
-		
-		int count =0;
-		kit = new ArrayList<String>();
-		for(String item : kitTemp)
+		for(String node : getConfiguration().getKeys("dreamland.inventory.kit"))
 		{
-			if(!item.equals(""))
-				kit.add(count + " " + item + " 0");
-			count ++;
+			kit.add(node + " " + getConfiguration().getString("dreamland.inventory.kit."+ node, "288 1") + " 0");
 		}
 		
 		getConfiguration().save();
 	}
-
-	public World dreamWorld()
+	
+	public DreamLandWorldSetting GetSetting(World world)
 	{
-		return getServer().getWorld(dreamWorld);
-	}
-	public World nightmareWorld()
-	{
-		return getServer().getWorld(nightmareWorld);
+		if(world.equals(dream.GetWorld()))
+		{
+			return dream;
+		}
+		if(world.equals(nightmare.GetWorld()))
+		{
+			return nightmare;
+		}
+		return base;
 	}
 	
+
 	public void loadChunk(Location location)
 	{
 		Chunk chunk = location.getBlock().getChunk();
 		location.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
 	}
+	
+	public void createPlayer(Player player)
+	{
+		Players.put(player.getName(), new DreamLandPlayerSetting(this).Update(player));
+	}
+	
+	public DreamLandPlayerSetting getPlayer(Player player)
+	{
+		String key = player.getName();
+		if(Players.containsKey(key))
+		{
+			return Players.get(key).Update(player);
+		}
+		log.info("Issue Loading Player");
+		createPlayer(player);
+		return getPlayer(player);
+	}
+	
 }
