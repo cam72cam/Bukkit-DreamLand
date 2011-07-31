@@ -1,5 +1,8 @@
 package me.cmesh.DreamLand;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.World;
 
 public class DreamLandWorld {
@@ -12,12 +15,14 @@ public class DreamLandWorld {
 	public Boolean Fly = false;
 	public Integer Chance = 0;
 	public Boolean Kit = false;
+	public List<String> Mobs = new ArrayList<String>();
+	public Integer MobChance = 0;
 	
 	public DreamLandWorld(DreamLand instance)
 	{
 		plugin = instance;
 	}
-	public World GetWorld()
+	public World getWorld()
 	{
 		return plugin.getServer().getWorld(World);
 	}

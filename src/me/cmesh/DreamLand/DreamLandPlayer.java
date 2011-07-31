@@ -48,7 +48,7 @@ public class DreamLandPlayer
 		
 		DreamLandWorld setting = nightmare? plugin.nightmare : plugin.dream;
 		
-		Location loc = setting.GetWorld().getSpawnLocation();
+		Location loc = setting.getWorld().getSpawnLocation();
 		
 		plugin.loadChunk(loc);
 		
@@ -306,7 +306,7 @@ public class DreamLandPlayer
 	
 	public Boolean Dreaming()
 	{
-		return player.getWorld().equals(plugin.dream.GetWorld())
-		|| (player.getWorld().equals(plugin.nightmare.GetWorld()) && plugin.nightmare.Chance != 0);
+		return player.getWorld().equals(plugin.dream.getWorld())
+		|| (player.getWorld().equals(plugin.nightmare.getWorld()) && plugin.nightmare.Chance != 0);
 	}
 }

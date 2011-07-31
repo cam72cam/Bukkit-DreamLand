@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -61,13 +62,10 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
 		DreamLandPlayer player = plugin.getPlayer(event.getPlayer());
+		DreamLandWorld world = plugin.getSetting(player.get().getWorld());
 		
 		if (player.Dreaming())
 		{
-			if(plugin.getSetting(player.get().getWorld()).Flaming)
-			{
-				player.get().setFireTicks(3*30);
-			}
 			if (event.getTo().getY() < 0)
 			{
 				player.leaveDream();
@@ -80,8 +78,28 @@ public class DreamLandPlayerListener extends PlayerListener
 				{
 					player.get().sendMessage("It is morning, WAKEUP!");
 					player.leaveDream(); 
+					return;
 				}
-				return;
+			}
+			if(world.Flaming)
+			{
+				player.get().setFireTicks(3*30);
+			}
+			if(new Random().nextInt(1000) < world.MobChance)
+			{
+				for(String mob : world.Mobs)
+				{
+					CreatureType ct = CreatureType.fromName(mob);
+		            if (ct == null) continue;
+		            int amount = new Random().nextInt(3);
+		            for (int i = 0; i < amount; i++)
+		            {
+		            	Location loc = player.get().getLocation();
+		            	loc.setX(loc.getX() + 10);
+		                world.getWorld().spawnCreature(loc, ct);
+		            	log.info("spawned " +mob);
+		            }
+				}
 			}
 		}
 	}

@@ -76,12 +76,12 @@ public class DreamLand extends JavaPlugin
 		if(nightmare.Chance != 0)
 		{
 			getServer().createWorld(nightmare.World, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
-			loadChunk(nightmare.GetWorld().getSpawnLocation());
+			loadChunk(nightmare.getWorld().getSpawnLocation());
 		}
 		
 		// Load DreamWorld
 		getServer().createWorld(dream.World,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
-		loadChunk(dream.GetWorld().getSpawnLocation());
+		loadChunk(dream.getWorld().getSpawnLocation());
 		
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled!");
 	}
@@ -128,6 +128,19 @@ public class DreamLand extends JavaPlugin
 		dream.Flaming = getConfiguration().getBoolean("dreamland.worlds.dream.flaming", false);
 		dream.Kit = getConfiguration().getBoolean("dreamland.worlds.dream.kit", true);
 		dream.Chance = getConfiguration().getInt("dreamland.chance.dream",100);
+
+		dream.MobChance = getConfiguration().getInt("dreamland.worlds.dream.mobChance",0);
+		try
+		{
+			for(String node : getConfiguration().getKeys("dreamland.worlds.dream.mobs"))
+			{
+				if(getConfiguration().getBoolean("dreamland.worlds.dream.mobs."+node, true))
+				{
+					dream.Mobs.add(node);
+				}
+			}
+		}
+		catch (java.lang.NullPointerException e){}
 		
 		nightmare.World = getConfiguration().getString("dreamland.worlds.nightmare.name",getServer().getWorlds().get(0).getName()+"_nightmare");
 		nightmare.PersistInventory = getConfiguration().getBoolean("dreamland.worlds.nightmare.persistInventory",false);
@@ -137,6 +150,19 @@ public class DreamLand extends JavaPlugin
 		nightmare.Flaming = getConfiguration().getBoolean("dreamland.worlds.nightmare.flaming", true);
 		nightmare.Kit = getConfiguration().getBoolean("dreamland.worlds.nightmare.kit", false);
 		nightmare.Chance = getConfiguration().getInt("dreamland.chance.nightmare",50);
+		
+		nightmare.MobChance = getConfiguration().getInt("dreamland.worlds.nightmare.mobChance",0);
+		try
+		{
+			for(String node : getConfiguration().getKeys("dreamland.worlds.nightmare.mobs"))
+			{
+				if(getConfiguration().getBoolean("dreamland.worlds.nightmare.mobs."+node, true))
+				{
+					nightmare.Mobs.add(node);
+				}
+			}
+		}
+		catch (java.lang.NullPointerException e){}
 		
 		base.PersistInventory = getConfiguration().getBoolean("dreamland.worlds.default.persistInventory",true);
 		
@@ -161,11 +187,11 @@ public class DreamLand extends JavaPlugin
 	
 	public DreamLandWorld getSetting(World world)
 	{
-		if(world.equals(dream.GetWorld()))
+		if(world.equals(dream.getWorld()))
 		{
 			return dream;
 		}
-		if(world.equals(nightmare.GetWorld()))
+		if(world.equals(nightmare.getWorld()))
 		{
 			return nightmare;
 		}
