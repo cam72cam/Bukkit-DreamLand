@@ -16,7 +16,12 @@ public class DreamLandWeatherListener extends WeatherListener
 	
 	public void onWeatherChange( WeatherChangeEvent event )
 	{
-		if( !event.isCancelled() && event.toWeatherState() && event.getWorld().equals(plugin.dream.getWorld()))
+		if(!plugin.weatherDisable)
+		{
+			return;
+		}
+		
+		if(!event.isCancelled() && event.toWeatherState() && event.getWorld().equals(plugin.dream.getWorld()))
 		{
 			event.setCancelled( true );
 		}
@@ -24,6 +29,10 @@ public class DreamLandWeatherListener extends WeatherListener
 
 	public void onThunderChange( ThunderChangeEvent event )
 	{
+		if(!plugin.weatherDisable)
+		{
+			return;
+		}
 		if( !event.isCancelled() && event.toThunderState() && event.getWorld().equals(plugin.dream.getWorld()) )
 		{
 			event.setCancelled( true );
@@ -32,6 +41,10 @@ public class DreamLandWeatherListener extends WeatherListener
 
 	public void onLightningStrike( LightningStrikeEvent event )
 	{
+		if(!plugin.weatherDisable)
+		{
+			return;
+		}
 		if(!event.isCancelled() && event.getWorld().equals(plugin.dream.getWorld()) )
 		{
 			event.setCancelled( true );

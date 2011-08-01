@@ -40,6 +40,7 @@ public class DreamLand extends JavaPlugin
 	public Integer attemptWait = 0;
 	public String message = "";
 	public Boolean morningReturn = true;
+	public Boolean weatherDisable = false;
 	
 	
 	private HashMap<String, DreamLandPlayer> Players= new HashMap<String, DreamLandPlayer>(); 
@@ -171,16 +172,21 @@ public class DreamLand extends JavaPlugin
 		attemptWait = getConfiguration().getInt("dreamland.options.attemptWait", 0) * 30;
 		message = getConfiguration().getString("dreamland.options.message", "");
 		morningReturn = getConfiguration().getBoolean("dreamland.options.wakeup", true);
+		weatherDisable = getConfiguration().getBoolean("dreamland.options.weatherDisable", false);
 		
 		//fly
 		flySpeed = getConfiguration().getDouble("dreamland.fly.speed", 1.0);
 		flyTool = getConfiguration().getInt("dreamland.fly.tool",288);
 		
 		//inventory
-		for(String node : getConfiguration().getKeys("dreamland.inventory.kit"))
+		try
 		{
-			kit.add(node + " " + getConfiguration().getString("dreamland.inventory.kit."+ node, "288 1") + " 0");
+			for(String node : getConfiguration().getKeys("dreamland.inventory.kit"))
+			{
+				kit.add(node + " " + getConfiguration().getString("dreamland.inventory.kit."+ node, "288 1") + " 0");
+			}
 		}
+		catch (java.lang.NullPointerException e){}
 		
 		getConfiguration().save();
 	}
