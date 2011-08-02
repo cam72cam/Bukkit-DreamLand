@@ -71,7 +71,8 @@ public class DreamLandPlayer
 		player.setFireTicks(0);
 		player.setFallDistance(0);
 		
-		Location loc = getBed();
+		Location loc = plugin.getSetting(player.getWorld()).ReturnToBed ? getBed() : getBed().getWorld().getSpawnLocation();
+		
 		plugin.loadChunk(loc);
 
 		savePlayerInv(player.getWorld());

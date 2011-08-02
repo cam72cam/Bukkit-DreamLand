@@ -42,9 +42,7 @@ public class DreamLand extends JavaPlugin
 	public Boolean morningReturn = true;
 	public Boolean weatherDisable = false;
 	
-	
 	private HashMap<String, DreamLandPlayer> Players= new HashMap<String, DreamLandPlayer>(); 
-	
 	
 	public void onEnable()
 	{ 
@@ -84,6 +82,7 @@ public class DreamLand extends JavaPlugin
 		getServer().createWorld(dream.World,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
 		loadChunk(dream.getWorld().getSpawnLocation());
 		
+		
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled!");
 	}
 
@@ -100,6 +99,19 @@ public class DreamLand extends JavaPlugin
 					Location location = player.getLocation();
 					player.getWorld().setSpawnLocation((int)location.getX(), (int)location.getY(), (int)location.getZ());
 					player.sendMessage("Spawn set to: " + (int)location.getX() + "x," + (int)location.getY() + "y," + (int)location.getZ() + "z");
+					return true;
+				}
+			}
+		}
+		if (commandLabel.equalsIgnoreCase("wakeup")) 
+		{
+			if (sender instanceof Player) 
+			{
+				Player player = (Player)sender;
+				DreamLandPlayer playerInfo = getPlayer(player);
+				if(playerInfo.Dreaming())
+				{
+					playerInfo.leaveDream();
 					return true;
 				}
 			}
@@ -129,6 +141,7 @@ public class DreamLand extends JavaPlugin
 		dream.Flaming = getConfiguration().getBoolean("dreamland.worlds.dream.flaming", false);
 		dream.Kit = getConfiguration().getBoolean("dreamland.worlds.dream.kit", true);
 		dream.Chance = getConfiguration().getInt("dreamland.chance.dream",100);
+		dream.ReturnToBed = getConfiguration().getBoolean("dreamland.worlds.dream.returnToBed", true);
 
 		dream.MobChance = getConfiguration().getInt("dreamland.worlds.dream.mobChance",0);
 		try
@@ -151,6 +164,7 @@ public class DreamLand extends JavaPlugin
 		nightmare.Flaming = getConfiguration().getBoolean("dreamland.worlds.nightmare.flaming", true);
 		nightmare.Kit = getConfiguration().getBoolean("dreamland.worlds.nightmare.kit", false);
 		nightmare.Chance = getConfiguration().getInt("dreamland.chance.nightmare",50);
+		nightmare.ReturnToBed = getConfiguration().getBoolean("dreamland.worlds.nightmare.returnToBed", true);
 		
 		nightmare.MobChance = getConfiguration().getInt("dreamland.worlds.nightmare.mobChance",0);
 		try

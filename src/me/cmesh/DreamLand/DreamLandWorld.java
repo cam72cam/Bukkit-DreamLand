@@ -17,6 +17,7 @@ public class DreamLandWorld {
 	public Boolean Kit = false;
 	public List<String> Mobs = new ArrayList<String>();
 	public Integer MobChance = 0;
+	public Boolean ReturnToBed = true;
 	
 	public DreamLandWorld(DreamLand instance)
 	{
