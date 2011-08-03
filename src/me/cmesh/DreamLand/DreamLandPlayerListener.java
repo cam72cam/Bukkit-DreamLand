@@ -1,7 +1,6 @@
 package me.cmesh.DreamLand;
 
 import java.util.Random;
-import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.entity.CreatureType;
@@ -21,7 +20,6 @@ import org.bukkit.util.Vector;
 public class DreamLandPlayerListener extends PlayerListener
 {
 	private static DreamLand plugin;
-	private static final Logger log = Logger.getLogger("Minecraft");
 	
 	public DreamLandPlayerListener(DreamLand instance)
 	{
@@ -62,7 +60,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
 		DreamLandPlayer player = plugin.getPlayer(event.getPlayer());
-		DreamLandWorld world = plugin.getSetting(player.get().getWorld());
+		DreamLandWorld world = plugin.getSetting(player.getWorld());
 		
 		if (player.Dreaming())
 		{
@@ -73,17 +71,17 @@ public class DreamLandPlayerListener extends PlayerListener
 			}
 			if(plugin.morningReturn)
 			{
-				long time = player.getBed().getWorld().getTime();
+				long time = player.getBedWorld().getTime();
 				if(time >=0 && time <= 12000)
 				{
-					player.get().sendMessage("It is morning, WAKEUP!");
+					player.sendMessage("It is morning, WAKEUP!");
 					player.leaveDream(); 
 					return;
 				}
 			}
 			if(world.Flaming)
 			{
-				player.get().setFireTicks(3*30);
+				player.self().setFireTicks(3*30);
 			}
 			if(new Random().nextInt(1000) < world.MobChance)
 			{
@@ -94,10 +92,9 @@ public class DreamLandPlayerListener extends PlayerListener
 		            int amount = new Random().nextInt(3);
 		            for (int i = 0; i < amount; i++)
 		            {
-		            	Location loc = player.get().getLocation();
+		            	Location loc = player.getLocation();
 		            	loc.setX(loc.getX() + 10);
 		                world.getWorld().spawnCreature(loc, ct);
-		            	log.info("spawned " +mob);
 		            }
 				}
 			}
@@ -108,29 +105,24 @@ public class DreamLandPlayerListener extends PlayerListener
 	{
 		DreamLandPlayer player = plugin.getPlayer(event.getPlayer());
 		
-		if(player.Dreaming())
-		{
-			return;
-		}
+		if(player.Dreaming()){return;}
 		
-		if (plugin.anyoneCanGo || plugin.checkPermissions(player.get(),"dreamland.goto",true))
-		{
-			
+		if (plugin.anyoneCanGo || plugin.checkPermissions(player.self(),"dreamland.goto",true))
+		{	
 			if ((plugin.attemptWait == 0 || player.getWait()) && new Random().nextInt(100) < plugin.dream.Chance)
 			{
 				event.setCancelled(true);
 				
 				Boolean nightmare = (plugin.nightmare.Chance != 0) && new Random().nextInt(100) < plugin.nightmare.Chance;
 				
-				player.enterDream(player.get().getLocation(),nightmare);
+				player.enterDream(player.getLocation(),nightmare);
+				
 				player.setAttempt(new Long(0));
+				return;
 			}
-			else
+			if(player.getWait())
 			{
-				if(player.getWait())
-				{
-					player.setAttempt(plugin.getServer().getWorlds().get(0).getTime());
-				}
+				player.setAttempt(player.getWorld().getTime());
 			}
 		}
 	}
@@ -143,28 +135,14 @@ public class DreamLandPlayerListener extends PlayerListener
 			player.leaveDream();
 		}
 	}
-
 	
 	public void onPlayerRespawn(PlayerRespawnEvent event)
 	{
-		DreamLandPlayer player = plugin.getPlayer(event.getPlayer());
-		
-		Location loc =  player.getBed();
-		
-		plugin.loadChunk(loc);
-		event.setRespawnLocation(loc);
-		
-		player.savePlayerInv(player.get().getWorld());
-		player.loadPlayerInv(loc.getWorld());
-		
-		log.info(player.get().getName() + " woke up");
-		
+		event.setRespawnLocation(plugin.getPlayer(event.getPlayer()).respawn());
 	}
-
 	
 	public void onPlayerKick(PlayerKickEvent event)
 	{
-		//TODO make this only for when moving between worlds
 		if(event.getReason().contains("moved too quickly")) 
 		{
 			event.setCancelled(true);
@@ -175,5 +153,4 @@ public class DreamLandPlayerListener extends PlayerListener
 	{
 		plugin.createPlayer(event.getPlayer());
 	}
-
 }

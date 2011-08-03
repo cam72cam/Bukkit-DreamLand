@@ -2,10 +2,6 @@ name: DreamLand
 main: me.cmesh.DreamLand.DreamLand
 version: 2.2
 commands:
-   setdreamspawn:
-      description: This will set the spawnpoint of DreamLand
-      usage: |
-          /setdreamspawn
    wakeup:
       description: User will leave the dream they are in
       usage: |
