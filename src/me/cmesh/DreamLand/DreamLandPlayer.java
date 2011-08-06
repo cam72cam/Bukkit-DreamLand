@@ -1,14 +1,6 @@
 package me.cmesh.DreamLand;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -72,7 +64,7 @@ public class DreamLandPlayer
 		player.setFallDistance(0);
 		Health.load();
 		
-		Location loc = plugin.getSetting(player.getWorld()).ReturnToBed ? Bed.get() : Bed.get().getWorld().getSpawnLocation();
+		Location loc = plugin.world(player.getWorld()).ReturnToBed ? Bed.get() : Bed.get().getWorld().getSpawnLocation();
 
 		Inventory.save(player.getWorld());
 		Inventory.load(loc.getWorld());
@@ -88,7 +80,7 @@ public class DreamLandPlayer
 		player.setFallDistance(0);
 		Health.load();
 		
-		Location loc = plugin.getSetting(player.getWorld()).ReturnToBed ? Bed.get() : Bed.get().getWorld().getSpawnLocation();
+		Location loc = plugin.world(player.getWorld()).ReturnToBed ? Bed.get() : Bed.get().getWorld().getSpawnLocation();
 
 		Inventory.save(player.getWorld());
 		Inventory.load(loc.getWorld());
@@ -155,10 +147,19 @@ public class DreamLandPlayer
 			}
 			return new File(invFolder + File.separator + player.getName() + "." + world.getName());
 		}
+		private File playerArmor(World world)
+		{
+			File invFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Inventories");
+			if (!invFolder.exists()) 
+			{
+				invFolder.mkdir();
+			}
+			return new File(invFolder + File.separator + player.getName() + "." + world.getName() + ".armor");
+		}
 		
 		public void save(World world)
 		{
-			if(plugin.getSetting(world).PersistInventory)
+			if(plugin.world(world).PersistInventory)
 			{
 				BufferedWriter bw;
 				try 
@@ -169,6 +170,21 @@ public class DreamLandPlayer
 					for(int i = 0; i<inv.length; i++)
 					{
 						ItemStack item = inv[i];
+						if(item != null)
+						{
+							String temp = i + " " + item.getTypeId() + " " + item.getAmount() + " "+ item.getDurability();
+							bw.write(temp);
+							bw.newLine();
+						}
+					}
+					bw.close();
+					
+					bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(playerArmor(world))));
+					ItemStack [] armor = player.getInventory().getArmorContents();
+					
+					for(int i = 0; i<armor.length; i++)
+					{
+						ItemStack item = armor[i];
 						if(item != null)
 						{
 							String temp = i + " " + item.getTypeId() + " " + item.getAmount() + " "+ item.getDurability();
@@ -196,50 +212,78 @@ public class DreamLandPlayer
 				player.getInventory().setItem(spot, new ItemStack(itemId, ammount, damage));
 			}
 		}
+		private void stringToArmor(List<String> armor)
+		{
+			ItemStack [] inv = new ItemStack [4];
+			for(String item : armor)
+			{
+				String [] split = item.split(" ", 4);
+				int spot = Integer.parseInt(split[0]);
+				int itemId = Integer.parseInt(split[1]);
+				int ammount = Integer.parseInt(split[2]);
+				short damage = (short)Integer.parseInt(split[3]);
+				inv[spot] = new ItemStack(itemId, ammount, damage);
+			}
+			player.getInventory().setArmorContents(inv);
+		}
 	
 		@SuppressWarnings("deprecation")
 		public void load(World world)
-	{
-		File save = playerInv(world);
-		try 
 		{
-			if (!save.exists()) 
+			File save = playerInv(world);
+			try 
 			{
-				if(plugin.getSetting(world).InitialInventoryClear)
+				if (!save.exists()) 
+				{
+					if(plugin.world(world).InitialInventoryClear)
+					{
+						player.getInventory().clear();
+						player.getInventory().setArmorContents(new ItemStack[4]);
+						if(plugin.kit.size() != 0 && plugin.world(world).Kit)
+						{
+							stringToInv(plugin.kit);
+						}
+						player.updateInventory();
+					}
+					return;
+				}
+				
+				if(plugin.world(world).PersistInventory)
 				{
 					player.getInventory().clear();
-					if(plugin.kit.size() != 0 && plugin.getSetting(world).Kit)
+					player.getInventory().setArmorContents(new ItemStack[4]);
+					
+					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
+					List<String> inv = new ArrayList<String>();
+					
+					String inputLine = br.readLine();
+					while (inputLine != null)
 					{
-						stringToInv(plugin.kit);
+						inv.add(inputLine);
+						inputLine = br.readLine();
 					}
+					stringToInv(inv);
+					
+					
+					br = new BufferedReader(new InputStreamReader(new FileInputStream(playerArmor(world))));
+					List<String> armor = new ArrayList<String>();
+					
+					inputLine = br.readLine();
+					while (inputLine != null)
+					{
+						armor.add(inputLine);
+						inputLine = br.readLine();
+					}
+					stringToArmor(armor);
+					
 					player.updateInventory();
 				}
 				return;
 			}
-			
-			if(plugin.getSetting(world).PersistInventory)
-			{
-				player.getInventory().clear();
-				
-				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
-				List<String> inv = new ArrayList<String>();
-				
-				String inputLine = br.readLine();
-				while (inputLine != null)
-				{
-					inv.add(inputLine);
-					inputLine = br.readLine();
-				}
-				stringToInv(inv);
-				
-				player.updateInventory();
-			}
-			return;
+			catch (IOException e){}
+			catch (java.lang.NumberFormatException e){}
+			player.sendMessage("There was an issue loading your inventory");
 		}
-		catch (IOException e){}
-		catch (java.lang.NumberFormatException e){}
-		player.sendMessage("There was an issue loading your inventory");
-	}
 	}
 	
 	private class bed

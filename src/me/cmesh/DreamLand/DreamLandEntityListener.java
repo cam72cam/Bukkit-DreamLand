@@ -17,7 +17,7 @@ public class DreamLandEntityListener extends EntityListener
 	{
 		if (event.getEntity() instanceof Player)
 		{
-			if(plugin.getSetting(event.getEntity().getWorld()).Invincible)
+			if(plugin.world(event.getEntity().getWorld()).Invincible)
 			{
 				event.setCancelled(true);
     		}

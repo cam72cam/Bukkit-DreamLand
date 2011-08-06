@@ -86,7 +86,7 @@ public class DreamLand extends JavaPlugin
 	{
 		if (commandLabel.equalsIgnoreCase("wakeup") && sender instanceof Player) 
 		{
-			DreamLandPlayer player = getPlayer((Player)sender);
+			DreamLandPlayer player = player((Player)sender);
 			if(player.Dreaming())
 			{
 				player.leaveDream();
@@ -164,7 +164,7 @@ public class DreamLand extends JavaPlugin
 		getConfiguration().save();
 	}
 	
-	public DreamLandWorld getSetting(World world)
+	public DreamLandWorld world(World world)
 	{
 		if(world.equals(dream.getWorld()))
 		{
@@ -177,19 +177,14 @@ public class DreamLand extends JavaPlugin
 		return base;
 	}
 	
-	public void createPlayer(Player player)
-	{
-		Players.put(player.getName(), new DreamLandPlayer(this).self(player));
-	}
-	
-	public DreamLandPlayer getPlayer(Player player)
+	public DreamLandPlayer player(Player player)
 	{
 		String key = player.getName();
 		if(Players.containsKey(key))
 		{
 			return Players.get(key).self(player);
 		}
-		createPlayer(player);
-		return getPlayer(player);
+		Players.put(player.getName(), new DreamLandPlayer(this).self(player));
+		return player(player);
 	}
 }

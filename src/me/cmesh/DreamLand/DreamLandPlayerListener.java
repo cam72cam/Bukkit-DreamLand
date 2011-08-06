@@ -6,15 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.util.Vector;
 
 public class DreamLandPlayerListener extends PlayerListener
@@ -29,7 +21,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	//Main Functions
 	public void onPlayerPortal(PlayerPortalEvent event)
 	{
-		event.setCancelled(plugin.getPlayer(event.getPlayer()).Dreaming());
+		event.setCancelled(plugin.player(event.getPlayer()).Dreaming());
 	}
   
 	public void onPlayerInteract(PlayerInteractEvent event)
@@ -39,7 +31,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		{
 			return;
 		}
-		if (!plugin.getSetting(player.getWorld()).Fly)
+		if (!plugin.world(player.getWorld()).Fly)
 		{
 			return;
 		}
@@ -59,8 +51,8 @@ public class DreamLandPlayerListener extends PlayerListener
 	
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
-		DreamLandPlayer player = plugin.getPlayer(event.getPlayer());
-		DreamLandWorld world = plugin.getSetting(player.getWorld());
+		DreamLandPlayer player = plugin.player(event.getPlayer());
+		DreamLandWorld world = plugin.world(player.getWorld());
 		
 		if (player.Dreaming())
 		{
@@ -103,7 +95,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	
 	public void onPlayerBedEnter(PlayerBedEnterEvent event)
 	{
-		DreamLandPlayer player = plugin.getPlayer(event.getPlayer());
+		DreamLandPlayer player = plugin.player(event.getPlayer());
 		
 		if(player.Dreaming()){return;}
 		
@@ -129,7 +121,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	
 	public void onPlayerQuit(PlayerQuitEvent event)
 	{
-		DreamLandPlayer player = plugin.getPlayer(event.getPlayer());
+		DreamLandPlayer player = plugin.player(event.getPlayer());
 		if (player.Dreaming())
 		{
 			player.leaveDream();
@@ -138,7 +130,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	
 	public void onPlayerRespawn(PlayerRespawnEvent event)
 	{
-		event.setRespawnLocation(plugin.getPlayer(event.getPlayer()).respawn());
+		event.setRespawnLocation(plugin.player(event.getPlayer()).respawn());
 	}
 	
 	public void onPlayerKick(PlayerKickEvent event)
@@ -151,6 +143,6 @@ public class DreamLandPlayerListener extends PlayerListener
 	
 	public void onPlayerLogin(PlayerLoginEvent event)
 	{
-		plugin.createPlayer(event.getPlayer());
+		plugin.player(event.getPlayer());
 	}
 }
