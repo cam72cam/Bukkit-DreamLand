@@ -16,7 +16,7 @@ public class DreamLandWeatherListener extends WeatherListener
 	
 	public void onWeatherChange( WeatherChangeEvent event )
 	{
-		if(!plugin.weatherDisable)
+		if(!plugin.options.weatherDisable)
 		{
 			return;
 		}
@@ -29,7 +29,7 @@ public class DreamLandWeatherListener extends WeatherListener
 
 	public void onThunderChange( ThunderChangeEvent event )
 	{
-		if(!plugin.weatherDisable)
+		if(!plugin.options.weatherDisable)
 		{
 			return;
 		}
@@ -41,7 +41,7 @@ public class DreamLandWeatherListener extends WeatherListener
 
 	public void onLightningStrike( LightningStrikeEvent event )
 	{
-		if(!plugin.weatherDisable)
+		if(!plugin.options.weatherDisable)
 		{
 			return;
 		}

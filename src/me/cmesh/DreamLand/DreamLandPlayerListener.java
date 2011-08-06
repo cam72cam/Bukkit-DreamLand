@@ -4,7 +4,6 @@ import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.entity.CreatureType;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.util.Vector;
@@ -18,7 +17,6 @@ public class DreamLandPlayerListener extends PlayerListener
 		plugin = instance;
 	}
 
-	//Main Functions
 	public void onPlayerPortal(PlayerPortalEvent event)
 	{
 		event.setCancelled(plugin.player(event.getPlayer()).Dreaming());
@@ -26,27 +24,17 @@ public class DreamLandPlayerListener extends PlayerListener
   
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
-		Player player = event.getPlayer();
-		if (!plugin.anyoneCanGo && !plugin.checkPermissions(player,"dreamland.fly",true))
-		{
-			return;
-		}
-		if (!plugin.world(player.getWorld()).Fly)
-		{
-			return;
-		}
-		if (plugin.flyTool != event.getPlayer().getItemInHand().getTypeId())
-		{
-			return;
-		}
-				
-		if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
-		{
-			Vector dir = player.getLocation().getDirection().multiply(plugin.flySpeed);
-			dir.setY(dir.getY()+0.60);
-			player.setVelocity(dir);
-			player.setFallDistance(0);
-		}
+		DreamLandPlayer player = plugin.player(event.getPlayer());
+		if (player.hasPermission("dreamland.fly",true))
+			if (plugin.world(player.getWorld()).Fly)
+				if (plugin.options.flyTool == event.getPlayer().getItemInHand().getTypeId())
+					if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
+					{
+						Vector dir = player.getLocation().getDirection().multiply(plugin.options.flySpeed);
+						dir.setY(dir.getY()+0.60);
+						player.self().setVelocity(dir);
+						player.self().setFallDistance(0);
+					}
 	}
 	
 	public void onPlayerMove(PlayerMoveEvent event)
@@ -61,7 +49,7 @@ public class DreamLandPlayerListener extends PlayerListener
 				player.leaveDream();
 				return;
 			}
-			if(plugin.morningReturn)
+			if(plugin.options.morningReturn && !player.hasPermission("dreamland.nowakeup", false))
 			{
 				long time = player.getBedWorld().getTime();
 				if(time >=0 && time <= 12000)
@@ -99,9 +87,9 @@ public class DreamLandPlayerListener extends PlayerListener
 		
 		if(player.Dreaming()){return;}
 		
-		if (plugin.anyoneCanGo || plugin.checkPermissions(player.self(),"dreamland.goto",true))
+		if (plugin.options.anyoneCanGo || player.hasPermission("dreamland.goto",plugin.options.anyoneCanGo))
 		{	
-			if ((plugin.attemptWait == 0 || player.getWait()) && new Random().nextInt(100) < plugin.dream.Chance)
+			if ((plugin.options.attemptWait == 0 || player.getWait()) && new Random().nextInt(100) < plugin.dream.Chance)
 			{
 				event.setCancelled(true);
 				

@@ -40,7 +40,7 @@ public class DreamLandPlayer
 		Bed.set(bed);
 		Health.save();
 		
-		DreamLandWorld setting = nightmare? plugin.nightmare : plugin.dream;
+		DreamLandWorld setting = nightmare ? plugin.nightmare : plugin.dream;
 		
 		Location loc = setting.getWorld().getSpawnLocation();
 		
@@ -49,9 +49,9 @@ public class DreamLandPlayer
 		
 		player.teleport(loc);
 		
-		if(!plugin.message.isEmpty())
+		if(!plugin.options.message.isEmpty())
 		{
-			player.sendMessage(plugin.message);
+			player.sendMessage(plugin.options.message);
 		}
 		
 		log.info(player.getName() + " is dreaming");
@@ -90,7 +90,12 @@ public class DreamLandPlayer
 		return loc;
 	}
 
-
+	public Boolean hasPermission(String permission, Boolean expected)
+	{
+		return player.isOp() || player.hasPermission(permission) 
+		|| (plugin.Permissions ==null ? expected : plugin.Permissions.has(player,permission));
+	}
+	
 	private class health
 	{
 		private File healthFile()
@@ -239,9 +244,9 @@ public class DreamLandPlayer
 					{
 						player.getInventory().clear();
 						player.getInventory().setArmorContents(new ItemStack[4]);
-						if(plugin.kit.size() != 0 && plugin.world(world).Kit)
+						if(plugin.options.kit.size() != 0 && plugin.world(world).Kit)
 						{
-							stringToInv(plugin.kit);
+							stringToInv(plugin.options.kit);
 						}
 						player.updateInventory();
 					}
@@ -365,14 +370,14 @@ public class DreamLandPlayer
 	public Boolean getWait()
 	{
 		Long time = plugin.getServer().getWorlds().get(0).getTime() - Attempt;
-		if(time >= plugin.attemptWait)
+		if(time >= plugin.options.attemptWait)
 		{
 			Attempt = plugin.getServer().getWorlds().get(0).getTime();
 			return true;
 		}
    		else
    		{
-   			player.sendMessage("Wait " + ((Long)((plugin.attemptWait - time)/30)).toString() + "s before trying again");
+   			player.sendMessage("Wait " + ((Long)((plugin.options.attemptWait - time)/30)).toString() + "s before trying again");
 			return false;
    		}
 	}
