@@ -118,7 +118,10 @@ public class DreamLandPlayerListener extends PlayerListener
 	
 	public void onPlayerRespawn(PlayerRespawnEvent event)
 	{
-		event.setRespawnLocation(plugin.player(event.getPlayer()).respawn());
+		if(plugin.player(event.getPlayer()).Dreaming())
+		{
+			event.setRespawnLocation(plugin.player(event.getPlayer()).respawn());
+		}
 	}
 	
 	public void onPlayerKick(PlayerKickEvent event)
