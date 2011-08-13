@@ -80,11 +80,28 @@ public class DreamLand extends JavaPlugin
 				return true;
 			}
 		}
+		/*if (commandLabel.equalsIgnoreCase("wakeall") && sender instanceof Player) 
+		{
+			for(DreamLandPlayer player : Players.values())
+			{
+				if(player.Dreaming())
+				{
+					player.leaveDream();
+				}
+			}
+		}*/
 		return false;
 	}
 	
 	public void onDisable()
 	{
+		for(DreamLandPlayer player : Players.values())
+		{
+			if(player.Dreaming())
+			{
+				player.leaveDream();
+			}
+		}
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is disabled!");
 	}
 	
@@ -151,5 +168,10 @@ public class DreamLand extends JavaPlugin
 		}
 		Players.put(player.getName(), new DreamLandPlayer(this).self(player));
 		return player(player);
+	}
+
+	public void removePlayer(DreamLandPlayer player) 
+	{
+		Players.remove(player.getName());		
 	}
 }

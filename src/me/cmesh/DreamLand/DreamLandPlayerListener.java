@@ -114,6 +114,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		{
 			player.leaveDream();
 		}
+		plugin.removePlayer(player);
 	}
 	
 	public void onPlayerRespawn(PlayerRespawnEvent event)

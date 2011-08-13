@@ -359,7 +359,7 @@ public class DreamLandPlayer
 	
 	public World getBedWorld()
 	{
-		return Bed.get().getWorld();
+		return Bed.get() == null ? plugin.getServer().getWorlds().get(0) : Bed.get().getWorld();
 	}
 	
 	public void setAttempt(Long time)
