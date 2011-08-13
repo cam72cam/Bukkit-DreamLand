@@ -307,7 +307,7 @@ public class DreamLandPlayer
 		
 		public Location get() 
 		{
-			if(Bed != null)
+			if(location != null)
 			{
 				return location;
 			}
@@ -325,7 +325,6 @@ public class DreamLandPlayer
 					{
 						String splits[] = inputLine.replace(',', '.').split(" ", 3);
 						Location bed = new Location(plugin.getServer().getWorld(world), Double.parseDouble(splits[0]), Double.parseDouble(splits[1]), Double.parseDouble(splits[2]));
-						//bed = checkSpawnLoc(bed);
 						location = bed;
 						return bed;
 					}
@@ -359,7 +358,7 @@ public class DreamLandPlayer
 	
 	public World getBedWorld()
 	{
-		return Bed.get() == null ? plugin.getServer().getWorlds().get(0) : Bed.get().getWorld();
+		return Bed.get().getWorld();
 	}
 	
 	public void setAttempt(Long time)
