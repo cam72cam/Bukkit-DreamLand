@@ -3,6 +3,9 @@ package me.cmesh.DreamLand;
 import java.util.Random;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
@@ -25,6 +28,8 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
 		DreamLandPlayer player = plugin.player(event.getPlayer());
+		Block block = event.getClickedBlock();
+		
 		if (player.hasPermission("dreamland.fly",true))
 			if (plugin.world(player.getWorld()).Fly)
 				if (plugin.options.flyTool == event.getPlayer().getItemInHand().getTypeId())
@@ -34,6 +39,31 @@ public class DreamLandPlayerListener extends PlayerListener
 						dir.setY(dir.getY()+0.60);
 						player.self().setVelocity(dir);
 						player.self().setFallDistance(0);
+					}
+		
+		// Attach a SIGN_POST to a BED with a RightClick
+		if (plugin.options.signedBed && player.hasPermission("dreamland.signbed", true))
+			if(event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
+				if(block.getType().equals(Material.SIGN_POST)) 
+					if (block.getRelative(BlockFace.NORTH).getTypeId() == 26) 
+					{
+						block.setTypeId(68); //Change to Wall Sign
+						block.setData((byte) 0x5); // Set Direction
+					}
+					else if (block.getRelative(BlockFace.EAST).getTypeId() == 26) 
+					{
+						block.setTypeId(68); //Change to Wall Sign
+						block.setData((byte) 0x3); // Set Direction
+					}
+					else if (block.getRelative(BlockFace.SOUTH).getTypeId() == 26) 
+					{
+						block.setTypeId(68); //Change to Wall Sign
+						block.setData((byte) 0x4); // Set Direction
+					}
+					else if (block.getRelative(BlockFace.WEST).getTypeId() == 26) 
+					{
+						block.setTypeId(68); //Change to Wall Sign
+						block.setData((byte) 0x2); // Set Direction
 					}
 	}
 	
@@ -84,25 +114,29 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerBedEnter(PlayerBedEnterEvent event)
 	{
 		DreamLandPlayer player = plugin.player(event.getPlayer());
+		Block block = event.getBed();
 		
 		if(player.Dreaming()){return;}
 		
 		if (plugin.options.anyoneCanGo || player.hasPermission("dreamland.goto",plugin.options.anyoneCanGo))
 		{	
-			if ((plugin.options.attemptWait == 0 || player.getWait()) && new Random().nextInt(100) < plugin.dream.Chance)
-			{
-				event.setCancelled(true);
-				
-				Boolean nightmare = (plugin.nightmare.Chance != 0) && new Random().nextInt(100) < plugin.nightmare.Chance;
-				
-				player.enterDream(player.getLocation(),nightmare);
-				
-				player.setAttempt(new Long(0));
-				return;
-			}
-			if(player.getWait())
-			{
-				player.setAttempt(player.getWorld().getTime());
+			if(plugin.checkBedSigned(block))
+			{				
+				if ((plugin.options.attemptWait == 0 || player.getWait()) && new Random().nextInt(100) < plugin.dream.Chance)
+				{
+					event.setCancelled(true);
+					
+					Boolean nightmare = (plugin.nightmare.Chance != 0) && new Random().nextInt(100) < plugin.nightmare.Chance;
+					
+					player.enterDream(player.getLocation(),nightmare);
+					
+					player.setAttempt(new Long(0));
+					return;
+				}
+				if(player.getWait())
+				{
+					player.setAttempt(player.getWorld().getTime());
+				}
 			}
 		}
 	}

@@ -14,6 +14,7 @@ public class DreamLandOptions
 	public Integer attemptWait;
 	public String message;
 	public Boolean morningReturn;
+	public Boolean signedBed;
 	public Boolean weatherDisable;
 	
 	public DreamLandOptions(DreamLand instance)
@@ -28,6 +29,7 @@ public class DreamLandOptions
 		attemptWait = plugin.getConfiguration().getInt("dreamland.options.attemptWait", 0) * 30;
 		message = plugin.getConfiguration().getString("dreamland.options.message", "");
 		morningReturn = plugin.getConfiguration().getBoolean("dreamland.options.wakeup", true);
+		signedBed = plugin.getConfiguration().getBoolean("dreamland.options.signedBed", false);
 		weatherDisable = plugin.getConfiguration().getBoolean("dreamland.options.weatherDisable", false);
 		
 		//fly

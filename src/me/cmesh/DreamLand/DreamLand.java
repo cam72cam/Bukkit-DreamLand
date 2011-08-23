@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -173,5 +175,60 @@ public class DreamLand extends JavaPlugin
 	public void removePlayer(DreamLandPlayer player) 
 	{
 		Players.remove(player.getName());		
+	}
+	
+	public boolean checkBedSigned(Block block)
+	{
+		// If option is false always true
+		if(!options.signedBed)
+			return true;
+		
+		// Setting BedBlock2
+		Block block2 = null;
+		
+		if (block.getRelative(BlockFace.NORTH).getTypeId() == 26)
+			block2 = block.getRelative(BlockFace.NORTH);
+		if (block.getRelative(BlockFace.EAST).getTypeId() == 26)
+			block2 = block.getRelative(BlockFace.EAST);
+		if (block.getRelative(BlockFace.SOUTH).getTypeId() == 26)
+			block2 = block.getRelative(BlockFace.SOUTH);
+		if (block.getRelative(BlockFace.WEST).getTypeId() == 26)
+			block2 = block.getRelative(BlockFace.WEST);
+		
+		// Sign Check BedBlock
+		if (block.getRelative(BlockFace.NORTH).getTypeId() == 68)
+			if (block.getRelative(BlockFace.NORTH).getData() == ((byte) 0x4))
+				return true;
+		
+		if (block.getRelative(BlockFace.EAST).getTypeId() == 68)
+			if (block.getRelative(BlockFace.EAST).getData() == ((byte) 0x2))
+				return true;
+		
+		if (block.getRelative(BlockFace.SOUTH).getTypeId() == 68)
+			if (block.getRelative(BlockFace.SOUTH).getData() == ((byte) 0x5))
+				return true;
+		
+		if (block.getRelative(BlockFace.WEST).getTypeId() == 68)
+			if (block.getRelative(BlockFace.WEST).getData() == ((byte) 0x4))
+				return true;
+
+		// Sign Check BedBlock2		
+		if (block2.getRelative(BlockFace.NORTH).getTypeId() == 68)
+			if (block2.getRelative(BlockFace.NORTH).getData() == ((byte) 0x4))
+				return true;
+		
+		if (block2.getRelative(BlockFace.EAST).getTypeId() == 68)
+			if (block2.getRelative(BlockFace.EAST).getData() == ((byte) 0x2))
+				return true;
+		
+		if (block2.getRelative(BlockFace.SOUTH).getTypeId() == 68)
+			if (block2.getRelative(BlockFace.SOUTH).getData() == ((byte) 0x5))
+				return true;
+		
+		if (block2.getRelative(BlockFace.WEST).getTypeId() == 68)
+			if (block2.getRelative(BlockFace.WEST).getData() == ((byte) 0x3))
+				return true;
+		
+		return false;
 	}
 }

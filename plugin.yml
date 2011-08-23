@@ -1,6 +1,6 @@
 name: DreamLand
 main: me.cmesh.DreamLand.DreamLand
-version: 2.4
+version: 2.5
 commands:
    wakeup:
       description: User will leave the dream they are in
