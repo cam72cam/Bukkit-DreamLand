@@ -120,7 +120,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		
 		if (plugin.options.anyoneCanGo || player.hasPermission("dreamland.goto",plugin.options.anyoneCanGo))
 		{	
-			if(plugin.checkBedSigned(block))
+			if(checkBedSigned(block))
 			{				
 				if ((plugin.options.attemptWait == 0 || player.getWait()) && new Random().nextInt(100) < plugin.dream.Chance)
 				{
@@ -170,5 +170,62 @@ public class DreamLandPlayerListener extends PlayerListener
 	public void onPlayerLogin(PlayerLoginEvent event)
 	{
 		plugin.player(event.getPlayer());
+	}
+	public boolean checkBedSigned(Block block)
+	{
+		// If option is false always true
+		if(!plugin.options.signedBed)
+		{
+			return true;
+		}
+		
+		// Setting BedBlock2
+		BlockFace face = null;
+		if (block.getRelative(BlockFace.NORTH).getTypeId() == 26)
+			face = BlockFace.NORTH;
+		if (block.getRelative(BlockFace.EAST).getTypeId() == 26)
+			face = BlockFace.EAST;
+		if (block.getRelative(BlockFace.SOUTH).getTypeId() == 26)
+			face = BlockFace.SOUTH;
+		if (block.getRelative(BlockFace.WEST).getTypeId() == 26)
+			face = BlockFace.WEST;
+		
+		Block block2 = face == null ? null : block.getRelative(face);
+		
+		// Sign Check BedBlock
+		if (block.getRelative(BlockFace.NORTH).getTypeId() == 68)
+			if (block.getRelative(BlockFace.NORTH).getData() == ((byte) 0x4))
+				return true;
+		
+		if (block.getRelative(BlockFace.EAST).getTypeId() == 68)
+			if (block.getRelative(BlockFace.EAST).getData() == ((byte) 0x2))
+				return true;
+		
+		if (block.getRelative(BlockFace.SOUTH).getTypeId() == 68)
+			if (block.getRelative(BlockFace.SOUTH).getData() == ((byte) 0x5))
+				return true;
+		
+		if (block.getRelative(BlockFace.WEST).getTypeId() == 68)
+			if (block.getRelative(BlockFace.WEST).getData() == ((byte) 0x4))
+				return true;
+
+		// Sign Check BedBlock2		
+		if (block2.getRelative(BlockFace.NORTH).getTypeId() == 68)
+			if (block2.getRelative(BlockFace.NORTH).getData() == ((byte) 0x4))
+				return true;
+		
+		if (block2.getRelative(BlockFace.EAST).getTypeId() == 68)
+			if (block2.getRelative(BlockFace.EAST).getData() == ((byte) 0x2))
+				return true;
+		
+		if (block2.getRelative(BlockFace.SOUTH).getTypeId() == 68)
+			if (block2.getRelative(BlockFace.SOUTH).getData() == ((byte) 0x5))
+				return true;
+		
+		if (block2.getRelative(BlockFace.WEST).getTypeId() == 68)
+			if (block2.getRelative(BlockFace.WEST).getData() == ((byte) 0x3))
+				return true;
+		
+		return false;
 	}
 }
