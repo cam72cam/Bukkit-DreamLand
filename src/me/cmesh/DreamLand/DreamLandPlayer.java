@@ -295,7 +295,7 @@ public class DreamLandPlayer
 	{
 		private Location location;
 		
-		private File bedFile(Player player)
+		private File bedFile()
 		{
 			File bedFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "BedLocations");
 			if (!bedFolder.exists()) 
@@ -311,7 +311,7 @@ public class DreamLandPlayer
 			{
 				return location;
 			}
-			File save = bedFile(player);
+			File save = bedFile();
 			if (save.exists()) 
 			{
 				try 
@@ -341,7 +341,7 @@ public class DreamLandPlayer
 			BufferedWriter bw;
 			try 
 			{
-				bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(bedFile(player))));
+				bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(bedFile())));
 				bw.write(player.getWorld().getName());
 				bw.newLine();
 				bw.write(String.format("%f %f %f", location.getX(), location.getY(), location.getZ()));

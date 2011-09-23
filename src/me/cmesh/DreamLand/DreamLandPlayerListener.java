@@ -5,6 +5,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.event.block.Action;
@@ -179,53 +180,28 @@ public class DreamLandPlayerListener extends PlayerListener
 			return true;
 		}
 		
-		// Setting BedBlock2
-		BlockFace face = null;
-		if (block.getRelative(BlockFace.NORTH).getTypeId() == 26)
-			face = BlockFace.NORTH;
-		if (block.getRelative(BlockFace.EAST).getTypeId() == 26)
-			face = BlockFace.EAST;
-		if (block.getRelative(BlockFace.SOUTH).getTypeId() == 26)
-			face = BlockFace.SOUTH;
-		if (block.getRelative(BlockFace.WEST).getTypeId() == 26)
-			face = BlockFace.WEST;
+		BlockFace [] faces = new  BlockFace[4];
+		faces[0] = BlockFace.NORTH;
+		faces[1] = BlockFace.SOUTH;
+		faces[2] = BlockFace.EAST;
+		faces[3] = BlockFace.WEST;
 		
-		Block block2 = face == null ? null : block.getRelative(face);
 		
-		// Sign Check BedBlock
-		if (block.getRelative(BlockFace.NORTH).getTypeId() == 68)
-			if (block.getRelative(BlockFace.NORTH).getData() == ((byte) 0x4))
-				return true;
+		Block block2 = null;
 		
-		if (block.getRelative(BlockFace.EAST).getTypeId() == 68)
-			if (block.getRelative(BlockFace.EAST).getData() == ((byte) 0x2))
-				return true;
+		for(BlockFace face : faces)
+			if (block.getRelative(face).getTypeId() == 26)
+				block2 = block.getRelative(face);
+				
+		for(BlockFace face : faces)
+			if (block.getRelative(face).getType() == Material.SIGN_POST)
+				if(((Sign)block.getRelative(face).getState()).getLine(0).equals("Dream Bed"))
+					return true;
 		
-		if (block.getRelative(BlockFace.SOUTH).getTypeId() == 68)
-			if (block.getRelative(BlockFace.SOUTH).getData() == ((byte) 0x5))
-				return true;
-		
-		if (block.getRelative(BlockFace.WEST).getTypeId() == 68)
-			if (block.getRelative(BlockFace.WEST).getData() == ((byte) 0x4))
-				return true;
-
-		// Sign Check BedBlock2		
-		if (block2.getRelative(BlockFace.NORTH).getTypeId() == 68)
-			if (block2.getRelative(BlockFace.NORTH).getData() == ((byte) 0x4))
-				return true;
-		
-		if (block2.getRelative(BlockFace.EAST).getTypeId() == 68)
-			if (block2.getRelative(BlockFace.EAST).getData() == ((byte) 0x2))
-				return true;
-		
-		if (block2.getRelative(BlockFace.SOUTH).getTypeId() == 68)
-			if (block2.getRelative(BlockFace.SOUTH).getData() == ((byte) 0x5))
-				return true;
-		
-		if (block2.getRelative(BlockFace.WEST).getTypeId() == 68)
-			if (block2.getRelative(BlockFace.WEST).getData() == ((byte) 0x3))
-				return true;
-		
+		for(BlockFace face : faces)
+			if (block2.getRelative(face).getType() == Material.SIGN_POST)
+				if(((Sign)block2.getRelative(face).getState()).getLine(0).equals("Dream Bed"))
+					return true;
 		return false;
 	}
 }
