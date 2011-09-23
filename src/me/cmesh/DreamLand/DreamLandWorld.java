@@ -2,6 +2,7 @@ package me.cmesh.DreamLand;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.World.Environment;
 
 import org.bukkit.World;
 
@@ -18,6 +19,7 @@ public class DreamLandWorld {
 	public List<String> Mobs = new ArrayList<String>();
 	public Integer MobChance = 0;
 	public Boolean ReturnToBed = true;
+	public Environment environment = Environment.NORMAL;
 	
 	public DreamLandWorld(DreamLand instance)
 	{
@@ -42,6 +44,7 @@ public class DreamLandWorld {
 		Kit = plugin.getConfiguration().getBoolean(endpoint + "kit", Kit);
 		Chance = plugin.getConfiguration().getInt("dreamland.chance."+world,Chance);
 		ReturnToBed = plugin.getConfiguration().getBoolean(endpoint + "returnToBed", ReturnToBed);
+		environment = Environment.valueOf(plugin.getConfiguration().getString(endpoint + "Environment", environment.toString()));
 		
 		MobChance = plugin.getConfiguration().getInt("dreamland.worlds.dream.mobChance",0);
 		try

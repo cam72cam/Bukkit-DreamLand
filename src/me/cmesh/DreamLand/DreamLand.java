@@ -3,6 +3,7 @@ package me.cmesh.DreamLand;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
@@ -62,22 +63,35 @@ public class DreamLand extends JavaPlugin
 		
 		if(nightmare.Chance != 0)
 		{
-			getServer().createWorld(nightmare.World, Environment.NETHER, getServer().getWorlds().get(0).getSeed());
+			getServer().createWorld(nightmare.World, nightmare.environment, getServer().getWorlds().get(0).getSeed());
 		}
-		getServer().createWorld(dream.World,Environment.SKYLANDS,getServer().getWorlds().get(0).getSeed());
+		getServer().createWorld(dream.World,dream.environment,getServer().getWorlds().get(0).getSeed());
 		
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled!");
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
 	{
-		if (commandLabel.equalsIgnoreCase("wakeup") && sender instanceof Player) 
+		if(sender instanceof Player)
 		{
 			DreamLandPlayer player = player((Player)sender);
-			if(player.Dreaming())
+			if (commandLabel.equalsIgnoreCase("setdreamspawn"))
 			{
-				player.leaveDream();
-				return true;
+				if(player.hasPermission("dreamland.setdreamspawn", false) && player.Dreaming())
+				{
+					Location location = player.getLocation();
+					location.getWorld().setSpawnLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+					return true;
+				}
+			}
+			
+			if (commandLabel.equalsIgnoreCase("wakeup")) 
+			{
+				if(player.Dreaming())
+				{
+					player.leaveDream();
+					return true;
+				}
 			}
 		}
 		return false;
@@ -114,6 +128,7 @@ public class DreamLand extends JavaPlugin
 		dream.Kit = true;
 		dream.Chance = 100;
 		dream.ReturnToBed = true;
+		dream.environment = Environment.SKYLANDS;
 		dream.load("dream");		
 	}
 	private void setupNightmare()
@@ -127,6 +142,7 @@ public class DreamLand extends JavaPlugin
 		nightmare.Kit = false;
 		nightmare.Chance = 50;
 		nightmare.ReturnToBed = true;
+		nightmare.environment = Environment.NETHER;
 		nightmare.load("nightmare");
 	}
 	private void setupBase()

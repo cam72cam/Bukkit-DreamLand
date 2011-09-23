@@ -6,3 +6,7 @@ commands:
       description: User will leave the dream they are in
       usage: |
           /wakeup
+   setdreamspawn:
+      description: User will set the world's spawn location
+      usage: |
+          /setdreamspawn
