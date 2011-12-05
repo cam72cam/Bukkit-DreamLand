@@ -3,6 +3,7 @@ package me.cmesh.DreamLand;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.World.Environment;
+import org.bukkit.WorldCreator;
 
 import org.bukkit.World;
 
@@ -20,6 +21,7 @@ public class DreamLandWorld {
 	public Integer MobChance = 0;
 	public Boolean ReturnToBed = true;
 	public Environment environment = Environment.NORMAL;
+	public String Generator;
 	
 	public DreamLandWorld(DreamLand instance)
 	{
@@ -30,6 +32,7 @@ public class DreamLandWorld {
 		return plugin.getServer().getWorld(World);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void load(String world)
 	{
 		plugin.getConfiguration().load();
@@ -44,7 +47,8 @@ public class DreamLandWorld {
 		Kit = plugin.getConfiguration().getBoolean(endpoint + "kit", Kit);
 		Chance = plugin.getConfiguration().getInt("dreamland.chance."+world,Chance);
 		ReturnToBed = plugin.getConfiguration().getBoolean(endpoint + "returnToBed", ReturnToBed);
-		environment = Environment.valueOf(plugin.getConfiguration().getString(endpoint + "Environment", environment.toString()));
+		environment = Environment.valueOf(plugin.getConfiguration().getString(endpoint + "environment", environment.toString()));
+		Generator = plugin.getConfiguration().getString(endpoint + "generator", Generator);
 		
 		MobChance = plugin.getConfiguration().getInt("dreamland.worlds.dream.mobChance",0);
 		try
@@ -61,5 +65,15 @@ public class DreamLandWorld {
 		
 		plugin.getConfiguration().save();
 		
+	}
+	
+	public void create()
+	{
+        WorldCreator c = new WorldCreator(World);
+        c.seed(plugin.getServer().getWorlds().get(0).getSeed());
+        c.environment(environment);
+		if(Generator != null && !Generator.isEmpty())
+	        c.generator(Generator);
+		plugin.getServer().createWorld(c);
 	}
 }

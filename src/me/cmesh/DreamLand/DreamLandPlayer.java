@@ -98,46 +98,19 @@ public class DreamLandPlayer
 	
 	private class health
 	{
-		private File healthFile()
-		{
-			File healthFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Health");
-			if (!healthFolder.exists()) 
-			{
-				healthFolder.mkdir();
-			}
-			return new File(healthFolder + File.separator + player.getName());
-		}
-
+		private int food;
+		private int health;
 
 		public void save()
 		{
-			BufferedWriter bw;
-			try 
-			{
-				bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(healthFile())));
-				bw.write(((Integer)player.getHealth()).toString());
-				bw.close();
-			}
-			catch (FileNotFoundException e) {}
-			catch (IOException e) {}
+			health = player.getHealth();
+			food = player.getFoodLevel();
 		}
 	
 		public void load()
 		{
-			File save = healthFile();
-			if (save.exists()) 
-			{
-				try 
-				{
-					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
-					player.setHealth(Integer.parseInt(br.readLine()));
-					br.close();
-				}
-				catch (IOException e) {}
-				catch (java.lang.NumberFormatException e){}
-				catch (java.lang.IllegalArgumentException e){}
-			}
-			return;
+			player.setHealth(health);
+			player.setFoodLevel(food);
 		}
 	}
 	

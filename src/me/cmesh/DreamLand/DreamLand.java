@@ -63,9 +63,9 @@ public class DreamLand extends JavaPlugin
 		
 		if(nightmare.Chance != 0)
 		{
-			getServer().createWorld(nightmare.World, nightmare.environment, getServer().getWorlds().get(0).getSeed());
+			nightmare.create();
 		}
-		getServer().createWorld(dream.World,dream.environment,getServer().getWorlds().get(0).getSeed());
+		dream.create();
 		
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled!");
 	}
@@ -119,7 +119,7 @@ public class DreamLand extends JavaPlugin
 	
 	private void setupDream()
 	{
-		dream.World = getServer().getWorlds().get(0).getName() + "_skylands";
+		dream.World = getServer().getWorlds().get(0).getName() + "_dream";
 		dream.PersistInventory = true;
 		dream.InitialInventoryClear = true;
 		dream.Invincible = true;
@@ -128,8 +128,9 @@ public class DreamLand extends JavaPlugin
 		dream.Kit = true;
 		dream.Chance = 100;
 		dream.ReturnToBed = true;
-		dream.environment = Environment.SKYLANDS;
-		dream.load("dream");		
+		dream.environment = Environment.NORMAL;//Environment.SKYLANDS;
+		dream.Generator = "SkylandsPlus";
+		dream.load("dream");
 	}
 	private void setupNightmare()
 	{
@@ -145,6 +146,7 @@ public class DreamLand extends JavaPlugin
 		nightmare.environment = Environment.NETHER;
 		nightmare.load("nightmare");
 	}
+	@SuppressWarnings("deprecation")
 	private void setupBase()
 	{
 		getConfiguration().load();

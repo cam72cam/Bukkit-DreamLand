@@ -22,6 +22,7 @@ public class DreamLandOptions
 		plugin = instance;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void load()
 	{
 		//options
