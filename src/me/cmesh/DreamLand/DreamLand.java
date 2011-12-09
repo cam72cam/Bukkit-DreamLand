@@ -38,6 +38,8 @@ public class DreamLand extends JavaPlugin
 		PluginManager pm = getServer().getPluginManager();
 
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.High, this);
+		pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Event.Priority.High, this);
+		
 		
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
@@ -189,7 +191,7 @@ public class DreamLand extends JavaPlugin
 	
 	public void startScheduler()
     {
-        getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CheckTime(), 0L, 200L);
+        getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CheckTime(), 0L, 1000L);
     }
 
     public void stopScheduler()
