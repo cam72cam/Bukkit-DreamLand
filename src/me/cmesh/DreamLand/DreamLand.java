@@ -67,6 +67,8 @@ public class DreamLand extends JavaPlugin
 		}
 		dream.create();
 		
+		startScheduler();
+		
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled!");
 	}
 
@@ -106,6 +108,7 @@ public class DreamLand extends JavaPlugin
 				player.leaveDream();
 			}
 		}
+		stopScheduler();
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is disabled!");
 	}
 	
@@ -182,4 +185,22 @@ public class DreamLand extends JavaPlugin
 	{
 		Players.remove(player.getName());		
 	}
+	
+	public void startScheduler()
+    {
+        getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CheckTime(), 0L, 200L);
+    }
+
+    public void stopScheduler()
+    {
+        getServer().getScheduler().cancelTasks(this);
+    }
+	
+	private class CheckTime implements Runnable
+	{
+		public void run()
+		{
+			dream.getWorld().setTime(100L);
+		}
+    }
 }

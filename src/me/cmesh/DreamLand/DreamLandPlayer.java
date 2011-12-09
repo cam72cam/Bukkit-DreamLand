@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,7 +49,26 @@ public class DreamLandPlayer
 		Inventory.save(player.getWorld());
 		Inventory.load(loc.getWorld());
 		
+		if(nightmare)
+		{
+		
+		}
+		else
+		{
+			if(loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
+			{
+				while(loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
+				{
+					loc = loc.getBlock().getRelative(BlockFace.NORTH).getLocation();
+				}
+				setting.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+			}
+		}
+
+		loc.getBlock().getChunk().load();
+		
 		player.teleport(loc);
+		player.sendMessage(loc.toString());
 		
 		if(!plugin.options.message.isEmpty())
 		{
@@ -98,9 +119,9 @@ public class DreamLandPlayer
 	
 	private class health
 	{
-		private int food;
 		private int health;
-
+		private int food;
+		
 		public void save()
 		{
 			health = player.getHealth();

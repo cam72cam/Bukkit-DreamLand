@@ -49,7 +49,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		
 		if (player.Dreaming())
 		{
-			if (event.getTo().getY() < 0)
+			if (event.getTo().getY() < 10)
 			{
 				player.leaveDream();
 				return;
