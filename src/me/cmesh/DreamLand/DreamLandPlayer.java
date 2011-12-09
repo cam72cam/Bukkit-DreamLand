@@ -51,13 +51,14 @@ public class DreamLandPlayer
 		
 		if(nightmare)
 		{
-			if(loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
+			if(loc.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR)
 			{
-				while(loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
+				while(loc.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR)
 				{
-					loc = loc.getBlock().getRelative(BlockFace.NORTH).getLocation();
+					player.sendMessage("DOWN");
+					loc = loc.getBlock().getRelative(BlockFace.DOWN).getLocation();
 				}
-				setting.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+				//setting.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 			}
 		}
 		else

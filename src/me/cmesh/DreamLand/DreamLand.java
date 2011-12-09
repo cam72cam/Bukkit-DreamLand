@@ -145,7 +145,7 @@ public class DreamLand extends JavaPlugin
 		nightmare.Fly = false;
 		nightmare.Flaming = true;
 		nightmare.Kit = false;
-		nightmare.Chance = 50;
+		nightmare.Chance = 20;
 		nightmare.ReturnToBed = true;
 		nightmare.environment = Environment.NETHER;
 		nightmare.load("nightmare");
