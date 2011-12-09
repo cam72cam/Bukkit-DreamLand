@@ -135,6 +135,8 @@ public class DreamLandPlayer
 		}
 	}
 	
+	
+	//TODO remove file ties
 	private class inventory
 	{
 		private File playerInv(World world)
@@ -289,42 +291,11 @@ public class DreamLandPlayer
 	{
 		private Location location;
 		
-		private File bedFile()
-		{
-			File bedFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "BedLocations");
-			if (!bedFolder.exists()) 
-			{
-				bedFolder.mkdir();
-			}
-			return new File(bedFolder + File.separator + player.getName());
-		}
-		
 		public Location get() 
 		{
 			if(location != null)
 			{
 				return location;
-			}
-			File save = bedFile();
-			if (save.exists()) 
-			{
-				try 
-				{
-					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
-					
-					String world = br.readLine();
-					String inputLine = br.readLine();
-					
-					if (inputLine != null && world != null) 
-					{
-						String splits[] = inputLine.replace(',', '.').split(" ", 3);
-						Location bed = new Location(plugin.getServer().getWorld(world), Double.parseDouble(splits[0]), Double.parseDouble(splits[1]), Double.parseDouble(splits[2]));
-						location = bed;
-						return bed;
-					}
-				}
-				catch (IOException e) {}
-				catch (java.lang.NumberFormatException e){}
 			}
 			log.info("There was an issue loading a player's bed location");
 			return plugin.getServer().getWorlds().get(0).getSpawnLocation();
@@ -332,20 +303,7 @@ public class DreamLandPlayer
 		
 		public void set(Location location) 
 		{
-			BufferedWriter bw;
-			try 
-			{
-				bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(bedFile())));
-				bw.write(player.getWorld().getName());
-				bw.newLine();
-				bw.write(String.format("%f %f %f", location.getX(), location.getY(), location.getZ()));
-				bw.close();
-				this.location = location;
-				return;
-			}
-			catch (FileNotFoundException e){}
-			catch (IOException e){}
-			log.info("There was an issue saving "+player.getName()+"'s bed location");
+			this.location = location;
 		}
 	}
 

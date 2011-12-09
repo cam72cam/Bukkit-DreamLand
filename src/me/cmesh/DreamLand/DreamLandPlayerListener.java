@@ -134,13 +134,13 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 	}
 	
-	public void onPlayerKick(PlayerKickEvent event)
+/*	public void onPlayerKick(PlayerKickEvent event)
 	{
 		if(event.getReason().contains("moved too quickly")) 
 		{
 			event.setCancelled(true);
 		}
-	}
+	}*/
 	
 	public void onPlayerLogin(PlayerLoginEvent event)
 	{
