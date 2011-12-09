@@ -55,7 +55,6 @@ public class DreamLandPlayer
 			{
 				while(loc.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR)
 				{
-					player.sendMessage("DOWN");
 					loc = loc.getBlock().getRelative(BlockFace.DOWN).getLocation();
 				}
 				//setting.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
@@ -78,7 +77,6 @@ public class DreamLandPlayer
 		loc.getBlock().getChunk().load();
 		
 		player.teleport(loc);
-		player.sendMessage(loc.toString());
 		
 		if(!plugin.options.message.isEmpty())
 		{

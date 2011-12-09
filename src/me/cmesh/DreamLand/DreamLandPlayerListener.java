@@ -87,27 +87,33 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 	}
 	
-	public void onPlayerBedEnter(PlayerBedEnterEvent event)
+	public void onPlayerBedEnter(final PlayerBedEnterEvent event)
 	{
-		DreamLandPlayer player = plugin.player(event.getPlayer());
+		final DreamLandPlayer player = plugin.player(event.getPlayer());
 		Block block = event.getBed();
 		
 		if(player.Dreaming()){return;}
 		
 		if (plugin.options.anyoneCanGo || player.hasPermission("dreamland.goto",plugin.options.anyoneCanGo))
-		{	
+		{
 			if(checkBedSigned(block))
 			{				
 				if ((plugin.options.attemptWait == 0 || player.getWait()) && new Random().nextInt(100) < plugin.dream.Chance)
 				{
-					event.setCancelled(true);
-					
-					Boolean nightmare = (plugin.nightmare.Chance != 0) && new Random().nextInt(100) < plugin.nightmare.Chance;
-					
-					player.enterDream(player.getLocation(),nightmare);
-					
-					player.setAttempt(new Long(0));
-					return;
+					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() 
+			        {
+			        	public void run()
+			        	{
+							event.setCancelled(true);
+							
+							Boolean nightmare = (plugin.nightmare.Chance != 0) && new Random().nextInt(100) < plugin.nightmare.Chance;
+							
+							player.enterDream(player.getLocation(),nightmare);
+							
+							player.setAttempt(new Long(0));
+							return;
+				    	}
+		        	}, 60L);
 				}
 				if(player.getWait())
 				{
