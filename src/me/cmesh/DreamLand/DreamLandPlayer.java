@@ -51,7 +51,14 @@ public class DreamLandPlayer
 		
 		if(nightmare)
 		{
-		
+			if(loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
+			{
+				while(loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.AIR)
+				{
+					loc = loc.getBlock().getRelative(BlockFace.NORTH).getLocation();
+				}
+				setting.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+			}
 		}
 		else
 		{
@@ -63,6 +70,8 @@ public class DreamLandPlayer
 				}
 				setting.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 			}
+			
+			setting.getWorld().setTime(100L);
 		}
 
 		loc.getBlock().getChunk().load();
@@ -135,8 +144,6 @@ public class DreamLandPlayer
 		}
 	}
 	
-	
-	//TODO remove file ties
 	private class inventory
 	{
 		private File playerInv(World world)
@@ -306,7 +313,6 @@ public class DreamLandPlayer
 			this.location = location;
 		}
 	}
-
 	
 	public World getBedWorld()
 	{

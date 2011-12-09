@@ -49,6 +49,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		
 		if (player.Dreaming())
 		{
+			player.self().setFoodLevel(20);
 			if (event.getTo().getY() < 10)
 			{
 				player.leaveDream();
@@ -146,6 +147,7 @@ public class DreamLandPlayerListener extends PlayerListener
 	{
 		plugin.player(event.getPlayer());
 	}
+
 	public boolean checkBedSigned(Block block)
 	{
 		if(!plugin.options.signedBed)
