@@ -1,14 +1,14 @@
 package me.cmesh.DreamLand;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,11 +26,10 @@ public class DreamLandPlayer
 	private inventory Inventory = new inventory();
 	private health Health = new health();
 	
-	private Long Attempt = new Long(0);
 	private Player player;
+	public Long lastFly;
 	
 	private static DreamLand plugin;
-	private static final Logger log = Logger.getLogger("Minecraft");
 	
 	public DreamLandPlayer(DreamLand instance)
 	{
@@ -83,7 +82,7 @@ public class DreamLandPlayer
 			player.sendMessage(plugin.options.message);
 		}
 		
-		log.info(player.getName() + " is dreaming");
+		DreamLand.log.info(player.getName() + " is dreaming");
 		return;
 	}
 
@@ -98,7 +97,7 @@ public class DreamLandPlayer
 		Inventory.save(player.getWorld());
 		Inventory.load(loc.getWorld());
 		
-		log.info(player.getName() + " woke up");
+		DreamLand.log.info(player.getName() + " woke up");
 		
 		player.teleport(loc);
 	}
@@ -114,7 +113,7 @@ public class DreamLandPlayer
 		Inventory.save(player.getWorld());
 		Inventory.load(loc.getWorld());
 		
-		log.info(player.getName() + " woke up");
+		DreamLand.log.info(player.getName() + " woke up");
 		
 		return loc;
 	}
@@ -129,22 +128,62 @@ public class DreamLandPlayer
 	{
 		private int health;
 		private int food;
+		private float enchant;
 		
 		public void save()
 		{
 			health = player.getHealth();
 			food = player.getFoodLevel();
+			enchant = player.getExp();
 		}
 	
 		public void load()
 		{
 			player.setHealth(health);
 			player.setFoodLevel(food);
+			player.setExp(enchant);
 		}
 	}
 	
-	private class inventory
-	{
+	public class inventory
+	{				
+		private void WriteInv(File save, ItemStack[] inventory)
+		{
+			try
+			{
+				FileConfiguration out = YamlConfiguration.loadConfiguration(save);
+				
+				for(int i = 0; i < inventory.length; i++)
+				{
+					ItemStack item = inventory[i];
+					if(item != null)
+					{
+						out.set(i+"", item);
+					}
+					else
+					{
+						out.set(i+"", new ItemStack(Material.AIR));
+					}
+				}
+				out.save(save);
+			}
+			catch (Exception e)	{ e.printStackTrace(); }
+		}
+		
+		private void ReadInv(File save, ItemStack[] inventory)
+		{
+			try
+			{
+				FileConfiguration in = YamlConfiguration.loadConfiguration(save);
+				
+				for(int i = 0; i < inventory.length; i++)
+				{
+					inventory[i] = in.getItemStack(i+"");
+				}
+			}
+			catch (Exception e) {e.printStackTrace();}
+		}
+		
 		private File playerInv(World world)
 		{
 			File invFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Inventories");
@@ -154,6 +193,7 @@ public class DreamLandPlayer
 			}
 			return new File(invFolder + File.separator + player.getName() + "." + world.getName());
 		}
+		
 		private File playerArmor(World world)
 		{
 			File invFolder = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "Inventories");
@@ -168,128 +208,41 @@ public class DreamLandPlayer
 		{
 			if(plugin.world(world).PersistInventory)
 			{
-				BufferedWriter bw;
-				try 
-				{
-					bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(playerInv(world))));
-					
-					ItemStack [] inv =player.getInventory().getContents();
-					for(int i = 0; i<inv.length; i++)
-					{
-						ItemStack item = inv[i];
-						if(item != null)
-						{
-							String temp = i + " " + item.getTypeId() + " " + item.getAmount() + " "+ item.getDurability();
-							bw.write(temp);
-							bw.newLine();
-						}
-					}
-					bw.close();
-					
-					bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(playerArmor(world))));
-					ItemStack [] armor = player.getInventory().getArmorContents();
-					
-					for(int i = 0; i<armor.length; i++)
-					{
-						ItemStack item = armor[i];
-						if(item != null)
-						{
-							String temp = i + " " + item.getTypeId() + " " + item.getAmount() + " "+ item.getDurability();
-							bw.write(temp);
-							bw.newLine();
-						}
-					}
-					bw.close();
-				}
-				catch (FileNotFoundException e) {}
-				catch (IOException e) {}
+				WriteInv(playerInv(world), player.getInventory().getContents());
+				WriteInv(playerArmor(world), player.getInventory().getArmorContents());
 			}
 		}
-	
-		private void stringToInv(List<String> inv)
-		{
-			for(String item : inv)
-			{
-				String [] split = item.split(" ", 4);
-				int spot = Integer.parseInt(split[0]);
-				int itemId = Integer.parseInt(split[1]);
-				int ammount = Integer.parseInt(split[2]);
-				short damage = (short)Integer.parseInt(split[3]);
-				
-				player.getInventory().setItem(spot, new ItemStack(itemId, ammount, damage));
-			}
-		}
-		private void stringToArmor(List<String> armor)
-		{
-			ItemStack [] inv = new ItemStack [4];
-			for(String item : armor)
-			{
-				String [] split = item.split(" ", 4);
-				int spot = Integer.parseInt(split[0]);
-				int itemId = Integer.parseInt(split[1]);
-				int ammount = Integer.parseInt(split[2]);
-				short damage = (short)Integer.parseInt(split[3]);
-				inv[spot] = new ItemStack(itemId, ammount, damage);
-			}
-			player.getInventory().setArmorContents(inv);
-		}
-	
-		@SuppressWarnings("deprecation")
+		
 		public void load(World world)
 		{
 			File save = playerInv(world);
-			try 
-			{
-				if (!save.exists()) 
-				{
-					if(plugin.world(world).InitialInventoryClear)
-					{
-						player.getInventory().clear();
-						player.getInventory().setArmorContents(new ItemStack[4]);
-						if(plugin.options.kit.size() != 0 && plugin.world(world).Kit)
-						{
-							stringToInv(plugin.options.kit);
-						}
-						player.updateInventory();
-					}
-					return;
-				}
-				
+			if (save.exists()) 
+			{		
 				if(plugin.world(world).PersistInventory)
+				{
+						player.getInventory().clear();
+						
+						ItemStack[] inventory = player.getInventory().getContents();
+						ReadInv(save, inventory);
+						player.getInventory().setContents(inventory);
+						
+						ItemStack[] armor = new ItemStack[4];
+						ReadInv(playerArmor(world), armor);
+						player.getInventory().setArmorContents(armor);
+				}
+			}
+			else
+			{
+				if(plugin.world(world).InitialInventoryClear)
 				{
 					player.getInventory().clear();
 					player.getInventory().setArmorContents(new ItemStack[4]);
-					
-					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(save)));
-					List<String> inv = new ArrayList<String>();
-					
-					String inputLine = br.readLine();
-					while (inputLine != null)
+					if(plugin.options.kit != null && plugin.world(world).Kit)
 					{
-						inv.add(inputLine);
-						inputLine = br.readLine();
+						player.getInventory().setContents(plugin.options.kit);
 					}
-					stringToInv(inv);
-					
-					
-					br = new BufferedReader(new InputStreamReader(new FileInputStream(playerArmor(world))));
-					List<String> armor = new ArrayList<String>();
-					
-					inputLine = br.readLine();
-					while (inputLine != null)
-					{
-						armor.add(inputLine);
-						inputLine = br.readLine();
-					}
-					stringToArmor(armor);
-					
-					player.updateInventory();
 				}
-				return;
 			}
-			catch (IOException e){}
-			catch (java.lang.NumberFormatException e){}
-			player.sendMessage("There was an issue loading your inventory");
 		}
 	}
 	
@@ -303,7 +256,7 @@ public class DreamLandPlayer
 			{
 				return location;
 			}
-			log.info("There was an issue loading a player's bed location");
+			DreamLand.log.info("There was an issue loading a player's bed location");
 			return plugin.getServer().getWorlds().get(0).getSpawnLocation();
 		}
 		
@@ -316,26 +269,6 @@ public class DreamLandPlayer
 	public World getBedWorld()
 	{
 		return Bed.get().getWorld();
-	}
-	
-	public void setAttempt(Long time)
-	{
-		Attempt = time;
-	}
-
-	public Boolean getWait()
-	{
-		Long time = plugin.getServer().getWorlds().get(0).getTime() - Attempt;
-		if(time >= plugin.options.attemptWait)
-		{
-			Attempt = plugin.getServer().getWorlds().get(0).getTime();
-			return true;
-		}
-   		else
-   		{
-   			player.sendMessage("Wait " + ((Long)((plugin.options.attemptWait - time)/30)).toString() + "s before trying again");
-			return false;
-   		}
 	}
 	
 	public Boolean Dreaming()

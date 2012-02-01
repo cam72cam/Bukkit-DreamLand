@@ -3,11 +3,13 @@ package me.cmesh.DreamLand;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.World.Environment;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.WorldCreator;
 
 import org.bukkit.World;
 
-public class DreamLandWorld {
+public class DreamLandWorld 
+{
 	public static DreamLand plugin;
 	public String World = new String();
 	public Boolean PersistInventory = false;
@@ -32,39 +34,58 @@ public class DreamLandWorld {
 		return plugin.getServer().getWorld(World);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void load(String world)
 	{
-		plugin.getConfiguration().load();
-		
+		FileConfiguration config = plugin.getConfig();
+				
 		String endpoint = "dreamland.worlds." + world + ".";
-		World = plugin.getConfiguration().getString(endpoint + "name",World);
-		PersistInventory = plugin.getConfiguration().getBoolean("dreamland.worlds.dream.persistInventory",PersistInventory);
-		InitialInventoryClear = plugin.getConfiguration().getBoolean(endpoint + "clearInitialInventory", InitialInventoryClear);
-		Invincible = plugin.getConfiguration().getBoolean(endpoint + "invincible", Invincible);
-		Fly = plugin.getConfiguration().getBoolean(endpoint + "fly", Fly);
-		Flaming = plugin.getConfiguration().getBoolean(endpoint + "flaming", Flaming);
-		Kit = plugin.getConfiguration().getBoolean(endpoint + "kit", Kit);
-		Chance = plugin.getConfiguration().getInt("dreamland.chance."+world,Chance);
-		ReturnToBed = plugin.getConfiguration().getBoolean(endpoint + "returnToBed", ReturnToBed);
-		environment = Environment.valueOf(plugin.getConfiguration().getString(endpoint + "environment", environment.toString()));
-		Generator = plugin.getConfiguration().getString(endpoint + "generator", Generator);
 		
-		MobChance = plugin.getConfiguration().getInt("dreamland.worlds.dream.mobChance",0);
+		World = config.getString(endpoint + "name",World);
+		config.set(endpoint + "name",World);
+		
+		PersistInventory = config.getBoolean("dreamland.worlds.dream.persistInventory",PersistInventory);
+		config.set(endpoint + ".persistInventory",PersistInventory);
+		
+		InitialInventoryClear = config.getBoolean(endpoint + "clearInitialInventory", InitialInventoryClear);
+		config.set(endpoint + "clearInitialInventory", InitialInventoryClear);
+		
+		Invincible = config.getBoolean(endpoint + "invincible", Invincible);
+		config.set(endpoint + "invincible", Invincible);
+		
+		Fly = config.getBoolean(endpoint + "fly", Fly);
+		config.set(endpoint + "fly", Fly);
+		
+		Flaming = config.getBoolean(endpoint + "flaming", Flaming);
+		config.set(endpoint + "flaming", Flaming);
+		
+		Kit = config.getBoolean(endpoint + "kit", Kit);
+		config.set(endpoint + "kit", Kit);
+		
+		Chance = config.getInt("dreamland.chance." + world,Chance);
+		config.set("dreamland.chance." + world,Chance);
+		
+		ReturnToBed = config.getBoolean(endpoint + "returnToBed", ReturnToBed);
+		config.set(endpoint + "returnToBed", ReturnToBed);
+		
+		environment = Environment.valueOf(config.getString(endpoint + "environment", environment.toString()));
+		config.set(endpoint + "environment", environment.toString());
+		
+		Generator = config.getString(endpoint + "generator", Generator);
+		config.set(endpoint + "generator", Generator);
+		
+		MobChance = config.getInt(endpoint + "mobChance",0);
+		config.set(endpoint + "mobChance",0);
+		
 		try
 		{
-			for(String node : plugin.getConfiguration().getKeys(endpoint +"mobs"))
+			for(String node : config.getStringList(endpoint +"mobs"))
 			{
-				if(plugin.getConfiguration().getBoolean("dreamland.worlds.dream.mobs."+node, true))
-				{
-					Mobs.add(node);
-				}
+				Mobs.add(node);
 			}
 		}
-		catch (java.lang.NullPointerException e){}
+		catch(NullPointerException e){}
 		
-		plugin.getConfiguration().save();
-		
+		plugin.saveConfig();
 	}
 	
 	public void create()

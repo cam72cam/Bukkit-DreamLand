@@ -3,29 +3,30 @@ package me.cmesh.DreamLand;
 import java.util.Random;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.util.Vector;
+import org.bukkit.event.*;
 
-public class DreamLandPlayerListener extends PlayerListener
+
+public class DreamLandPlayerListener implements Listener
 {
 	private static DreamLand plugin;
 	
 	public DreamLandPlayerListener(DreamLand instance)
 	{
 		plugin = instance;
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-
+	
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerPortal(PlayerPortalEvent event)
 	{
 		event.setCancelled(plugin.player(event.getPlayer()).Dreaming());
 	}
-  
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
 		DreamLandPlayer player = plugin.player(event.getPlayer());
@@ -39,9 +40,11 @@ public class DreamLandPlayerListener extends PlayerListener
 						dir.setY(dir.getY()+0.60);
 						player.self().setVelocity(dir);
 						player.self().setFallDistance(0);
+						player.lastFly = player.getWorld().getTime();
 					}
 	}
-	
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
 		DreamLandPlayer player = plugin.player(event.getPlayer());
@@ -50,7 +53,7 @@ public class DreamLandPlayerListener extends PlayerListener
 		if (player.Dreaming())
 		{
 			player.self().setFoodLevel(20);
-			if (event.getTo().getY() < 10)
+			if (event.getTo().getY() < 0)
 			{
 				player.leaveDream();
 				return;
@@ -86,43 +89,35 @@ public class DreamLandPlayerListener extends PlayerListener
 			}
 		}
 	}
-	
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerBedEnter(final PlayerBedEnterEvent event)
 	{
 		final DreamLandPlayer player = plugin.player(event.getPlayer());
-		Block block = event.getBed();
 		
 		if(player.Dreaming()){return;}
 		
 		if (plugin.options.anyoneCanGo || player.hasPermission("dreamland.goto",plugin.options.anyoneCanGo))
 		{
-			if(checkBedSigned(block))
-			{				
-				if ((plugin.options.attemptWait == 0 || player.getWait()) && new Random().nextInt(100) < plugin.dream.Chance)
-				{
-					plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() 
-			        {
-			        	public void run()
-			        	{
-							event.setCancelled(true);
-							
-							Boolean nightmare = (plugin.nightmare.Chance != 0) && new Random().nextInt(100) < plugin.nightmare.Chance;
-							
-							player.enterDream(player.getLocation(),nightmare);
-							
-							player.setAttempt(new Long(0));
-							return;
-				    	}
-		        	}, 60L);
-				}
-				if(player.getWait())
-				{
-					player.setAttempt(player.getWorld().getTime());
-				}
+			if (new Random().nextInt(100) < (plugin.dream.Chance + plugin.nightmare.Chance))
+			{
+				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() 
+		        {
+		        	public void run()
+		        	{
+						event.setCancelled(true);
+						
+						Boolean nightmare = (plugin.nightmare.Chance != 0) && new Random().nextInt(100) < plugin.nightmare.Chance;
+						
+						player.enterDream(player.getLocation(),nightmare);
+						
+			    	}
+	        	}, 60L);
 			}
 		}
 	}
-	
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerQuit(PlayerQuitEvent event)
 	{
 		DreamLandPlayer player = plugin.player(event.getPlayer());
@@ -132,7 +127,8 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 		plugin.removePlayer(player);
 	}
-	
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerRespawn(PlayerRespawnEvent event)
 	{
 		if(plugin.player(event.getPlayer()).Dreaming())
@@ -141,48 +137,21 @@ public class DreamLandPlayerListener extends PlayerListener
 		}
 	}
 	
-/*	public void onPlayerKick(PlayerKickEvent event)
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPlayerKick(PlayerKickEvent event)
 	{
-		if(event.getReason().contains("moved too quickly")) 
+		DreamLandPlayer player = plugin.player(event.getPlayer());
+		if(	event.getReason().contains("moved too quickly") && 
+			player.lastFly != null && 
+			player.lastFly >= player.getWorld().getTime() - 100)
 		{
 			event.setCancelled(true);
 		}
-	}*/
-	
+	}
+
+	@EventHandler
 	public void onPlayerLogin(PlayerLoginEvent event)
 	{
 		plugin.player(event.getPlayer());
-	}
-
-	public boolean checkBedSigned(Block block)
-	{
-		if(!plugin.options.signedBed)
-		{
-			return true;
-		}
-		
-		BlockFace [] faces = new  BlockFace[4];
-		faces[0] = BlockFace.NORTH;
-		faces[1] = BlockFace.SOUTH;
-		faces[2] = BlockFace.EAST;
-		faces[3] = BlockFace.WEST;
-		
-		
-		for(BlockFace face : faces)
-			if (block.getRelative(face).getType() == Material.SIGN_POST)
-				if(((Sign)block.getRelative(face).getState()).getLine(0).equals("Dream Bed"))
-					return true;
-		
-		Block block2 = null;
-		
-		for(BlockFace face : faces)
-			if (block.getRelative(face).getType() == Material.BED_BLOCK)
-				block2 = block.getRelative(face);
-				
-		for(BlockFace face : faces)
-			if (block2.getRelative(face).getType() == Material.SIGN_POST)
-				if(((Sign)block2.getRelative(face).getState()).getLine(0).equals("Dream Bed"))
-					return true;
-		return false;
 	}
 }

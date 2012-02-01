@@ -9,9 +9,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.Plugin;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
@@ -19,41 +17,19 @@ import com.nijiko.permissions.PermissionHandler;
 public class DreamLand extends JavaPlugin
 {
 	public static final Logger log = Logger.getLogger("Minecraft");
-	private final DreamLandPlayerListener playerListener = new DreamLandPlayerListener(this);
-	private final DreamLandEntityListener entityListener = new DreamLandEntityListener(this);
-	private final DreamLandWeatherListener weatherListener = new DreamLandWeatherListener(this);
-	
+
 	public DreamLandWorld nightmare = new DreamLandWorld(this);
 	public DreamLandWorld dream = new DreamLandWorld(this);
 	public DreamLandWorld base = new DreamLandWorld(this);
 	
-	public DreamLandOptions options = new DreamLandOptions(this);
-	
+	public DreamLandOptions options = new DreamLandOptions(this);	
 	public PermissionHandler Permissions = null;
 	
 	private HashMap<String, DreamLandPlayer> Players= new HashMap<String, DreamLandPlayer>(); 
 	
+	
 	public void onEnable()
 	{ 
-		PluginManager pm = getServer().getPluginManager();
-
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.High, this);
-		pm.registerEvent(Event.Type.CREATURE_SPAWN, entityListener, Event.Priority.High, this);
-		
-		
-		pm.registerEvent(Event.Type.PLAYER_PORTAL, playerListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_BED_ENTER, playerListener, Event.Priority.High, this);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.High, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.High, this);
-		//pm.registerEvent(Event.Type.PLAYER_KICK, playerListener, Event.Priority.High, this);
-		
-		
-		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.High, this);
-		pm.registerEvent(Event.Type.THUNDER_CHANGE, weatherListener, Event.Priority.High, this);
-		pm.registerEvent(Event.Type.LIGHTNING_STRIKE, weatherListener, Event.Priority.High, this);
 		
 		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
 		
@@ -71,6 +47,10 @@ public class DreamLand extends JavaPlugin
 		dream.create();
 		
 		startScheduler();
+
+		new DreamLandPlayerListener(this);
+		new DreamLandEntityListener(this);
+		new DreamLandWeatherListener(this);
 		
 		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled!");
 	}
@@ -203,7 +183,7 @@ public class DreamLand extends JavaPlugin
 	{
 		public void run()
 		{
-			dream.getWorld().setTime(100L);
+			dream.getWorld().setTime(500L);
 		}
     }
 }

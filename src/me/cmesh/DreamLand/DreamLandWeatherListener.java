@@ -1,19 +1,33 @@
 package me.cmesh.DreamLand;
 
-import org.bukkit.event.weather.LightningStrikeEvent;
-import org.bukkit.event.weather.ThunderChangeEvent;
-import org.bukkit.event.weather.WeatherChangeEvent;
-import org.bukkit.event.weather.WeatherListener;
+import org.bukkit.World;
+import org.bukkit.event.weather.*;
+import org.bukkit.event.*;
 
-public class DreamLandWeatherListener extends WeatherListener
+public class DreamLandWeatherListener implements Listener
 {
 	public static DreamLand plugin;
 
 	public DreamLandWeatherListener(DreamLand instance)
 	{
 		plugin = instance;
+		
+		if(plugin.options.weatherDisable)
+		{
+			Load(plugin.dream.getWorld());
+	        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+		}
 	}
-	
+
+	private void Load(World world) {
+		if(world.hasStorm())
+		{
+			world.setStorm(false);
+			world.setThundering(false);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)	
 	public void onWeatherChange( WeatherChangeEvent event )
 	{
 		if(!plugin.options.weatherDisable)
@@ -27,6 +41,7 @@ public class DreamLandWeatherListener extends WeatherListener
 		}
 	}
 
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onThunderChange( ThunderChangeEvent event )
 	{
 		if(!plugin.options.weatherDisable)
@@ -39,6 +54,7 @@ public class DreamLandWeatherListener extends WeatherListener
 		}
 	}
 
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onLightningStrike( LightningStrikeEvent event )
 	{
 		if(!plugin.options.weatherDisable)
