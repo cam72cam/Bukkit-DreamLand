@@ -43,10 +43,10 @@ public class DreamLandPlayerListener implements Listener
 						player.lastFly = player.getWorld().getTime();
 					}
 	}
-
+	
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerMove(PlayerMoveEvent event)
-	{
+	{		
 		DreamLandPlayer player = plugin.player(event.getPlayer());
 		DreamLandWorld world = plugin.world(player.getWorld());
 		
@@ -92,7 +92,7 @@ public class DreamLandPlayerListener implements Listener
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerBedEnter(final PlayerBedEnterEvent event)
-	{
+	{		
 		final DreamLandPlayer player = plugin.player(event.getPlayer());
 		
 		if(player.Dreaming()){return;}

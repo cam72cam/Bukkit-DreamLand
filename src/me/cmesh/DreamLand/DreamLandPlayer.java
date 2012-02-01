@@ -56,7 +56,6 @@ public class DreamLandPlayer
 				{
 					loc = loc.getBlock().getRelative(BlockFace.DOWN).getLocation();
 				}
-				//setting.getWorld().setSpawnLocation(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 			}
 		}
 		else
@@ -120,8 +119,7 @@ public class DreamLandPlayer
 
 	public Boolean hasPermission(String permission, Boolean expected)
 	{
-		return player.isOp() || player.hasPermission(permission) 
-		|| (plugin.Permissions ==null ? expected : plugin.Permissions.has(player,permission));
+		return player.isOp() || player.hasPermission(permission);
 	}
 	
 	private class health

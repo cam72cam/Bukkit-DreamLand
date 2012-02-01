@@ -43,13 +43,13 @@ public class DreamLandOptions
 		attemptWait = config.getInt(attemptWaitPath, 0) * 30;
 		message = config.getString(messagePath, "");
 		morningReturn = config.getBoolean(morningReturnPath, true);
-		signedBed = config.getBoolean(signedBedPath, false);
 		weatherDisable = config.getBoolean(weatherDisablePath, false);
 		
 		//fly
 		flySpeed = config.getDouble(flySpeedPath, 1.0);
 		flyTool = config.getInt(flyToolPath,288);
 		
+		//kit
 		if(config.contains(kitPath))
 		{
 			kit = new ItemStack[36];
@@ -63,7 +63,6 @@ public class DreamLandOptions
 	}
 	private void write(FileConfiguration config)
 	{
-		
 		config.set(anyoneCanGoPath, anyoneCanGo);
 		config.set(attemptWaitPath, attemptWait);
 		config.set(messagePath, message);

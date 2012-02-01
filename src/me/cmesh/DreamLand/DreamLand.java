@@ -8,11 +8,9 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.Plugin;
-import com.nijikokun.bukkit.Permissions.Permissions;
-import com.nijiko.permissions.PermissionHandler;
 
 public class DreamLand extends JavaPlugin
 {
@@ -22,22 +20,14 @@ public class DreamLand extends JavaPlugin
 	public DreamLandWorld dream = new DreamLandWorld(this);
 	public DreamLandWorld base = new DreamLandWorld(this);
 	
-	public DreamLandOptions options = new DreamLandOptions(this);	
-	public PermissionHandler Permissions = null;
+	public DreamLandOptions options = new DreamLandOptions(this);
 	
 	private HashMap<String, DreamLandPlayer> Players= new HashMap<String, DreamLandPlayer>(); 
 	
+	private Scheduler scheduler = new Scheduler(this);
 	
 	public void onEnable()
-	{ 
-		
-		Plugin permissions = getServer().getPluginManager().getPlugin("Permissions");
-		
-		if (Permissions == null)
-		{
-			Permissions = (permissions != null) ? ((Permissions)permissions).getHandler() : null;
-		}
-		
+	{
 		reload();
 		
 		if(nightmare.Chance != 0)
@@ -46,13 +36,11 @@ public class DreamLand extends JavaPlugin
 		}
 		dream.create();
 		
-		startScheduler();
+		scheduler.Start();
 
 		new DreamLandPlayerListener(this);
 		new DreamLandEntityListener(this);
 		new DreamLandWeatherListener(this);
-		
-		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is enabled!");
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
@@ -91,8 +79,7 @@ public class DreamLand extends JavaPlugin
 				player.leaveDream();
 			}
 		}
-		stopScheduler();
-		log.info(getDescription().getName()+" version "+getDescription().getVersion()+" is disabled!");
+		scheduler.Stop();
 	}
 	
 	public void reload()
@@ -132,12 +119,13 @@ public class DreamLand extends JavaPlugin
 		nightmare.environment = Environment.NETHER;
 		nightmare.load("nightmare");
 	}
-	@SuppressWarnings("deprecation")
+	
 	private void setupBase()
 	{
-		getConfiguration().load();
-		base.PersistInventory = getConfiguration().getBoolean("dreamland.worlds.default.persistInventory",true);
-		getConfiguration().save();
+		FileConfiguration config = getConfig();
+		base.PersistInventory = config.getBoolean("dreamland.worlds.default.persistInventory",true);
+		config.getBoolean("dreamland.worlds.default.persistInventory",true);
+		saveConfig();
 	}
 	
 	public DreamLandWorld world(World world)
@@ -168,22 +156,4 @@ public class DreamLand extends JavaPlugin
 	{
 		Players.remove(player.getName());		
 	}
-	
-	public void startScheduler()
-    {
-        getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CheckTime(), 0L, 1000L);
-    }
-
-    public void stopScheduler()
-    {
-        getServer().getScheduler().cancelTasks(this);
-    }
-	
-	private class CheckTime implements Runnable
-	{
-		public void run()
-		{
-			dream.getWorld().setTime(500L);
-		}
-    }
 }

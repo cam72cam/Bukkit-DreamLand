@@ -1,8 +1,7 @@
 package me.cmesh.DreamLand;
 
 import org.bukkit.event.*;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.entity.Player;
 
 public class DreamLandEntityListener implements Listener
@@ -14,7 +13,7 @@ public class DreamLandEntityListener implements Listener
 		plugin = instance;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-
+	
 	@EventHandler(priority = EventPriority.HIGH)	
 	public void onCreatureSpawnEvent(CreatureSpawnEvent event)
 	{
@@ -28,7 +27,7 @@ public class DreamLandEntityListener implements Listener
 					default: event.setCancelled(true);
 				}
 			}
-		}	
+		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -40,6 +39,18 @@ public class DreamLandEntityListener implements Listener
 			{
 				event.setCancelled(true);
     		}
+			else
+			{
+				DreamLandPlayer player = plugin.player((Player) event.getEntity());
+				if(player.Dreaming())
+				{
+					if(player.self().getHealth() <= event.getDamage())
+					{
+						event.setCancelled(true);
+						player.leaveDream();
+					}
+				}
+			}
 		}
 	}
 }
