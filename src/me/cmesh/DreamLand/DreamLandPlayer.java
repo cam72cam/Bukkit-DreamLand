@@ -260,6 +260,7 @@ public class DreamLandPlayer
 		
 		public void set(Location location) 
 		{
+			player.setBedSpawnLocation(location);
 			this.location = location;
 		}
 	}
