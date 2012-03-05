@@ -20,8 +20,8 @@ public class DreamLandEntityListener implements Listener
 		if(event.getLocation().getWorld().equals(plugin.dream.getWorld()))
 		{
 			if(plugin.dream.MobChance == 0)
-			{
-				switch (event.getCreatureType())
+			{				
+				switch (event.getEntityType())
 				{
 					case CHICKEN: case COW: case SHEEP: case PIG: case SQUID: case VILLAGER: return;
 					default: event.setCancelled(true);

@@ -3,7 +3,7 @@ package me.cmesh.DreamLand;
 import java.util.Random;
 
 import org.bukkit.Location;
-import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 import org.bukkit.util.Vector;
@@ -76,7 +76,7 @@ public class DreamLandPlayerListener implements Listener
 			{
 				for(String mob : world.Mobs)
 				{
-					CreatureType ct = CreatureType.fromName(mob);
+					EntityType ct = EntityType.fromName(mob);
 		            if (ct == null) continue;
 		            int amount = new Random().nextInt(3);
 		            for (int i = 0; i < amount; i++)
