@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class DreamLandPlayer
@@ -99,8 +100,9 @@ public class DreamLandPlayer
 		DreamLand.log.info(player.getName() + " woke up");
 		
 		player.teleport(loc);
+		player.setLastDamage(0);
+		player.getLastDamageCause().setCancelled(true);
 	}
-
 	public Location respawn()
 	{
 		player.setFireTicks(0);
