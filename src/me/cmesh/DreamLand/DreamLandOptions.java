@@ -58,20 +58,5 @@ public class DreamLandOptions
 			for(String key : kitKeys)
 				kit[Integer.parseInt(key)] = config.getItemStack(kitPath + "." + key);
 		}
-		
-		write(config);
-	}
-	private void write(FileConfiguration config)
-	{
-		config.set(anyoneCanGoPath, anyoneCanGo);
-		config.set(attemptWaitPath, attemptWait);
-		config.set(messagePath, message);
-		config.set(morningReturnPath, morningReturn);
-		config.set(signedBedPath, signedBed);
-		config.set(weatherDisablePath, weatherDisable);
-		config.set(flySpeedPath,flySpeed);
-		config.set(flyToolPath,flyTool);
-		
-		plugin.saveConfig();	
 	}
 }

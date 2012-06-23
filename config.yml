@@ -1,0 +1,37 @@
+dreamland:
+  worlds:
+    dream:
+      name: world_dream
+      persistInventory: true
+      clearInitialInventory: true
+      invincible: true
+      fly: true
+      flaming: false
+      kit: true
+      returnToBed: true
+      environment: NORMAL
+      generator: SkylandsPlus
+      mobChance: 0
+    nightmare:
+      name: world_nightmare
+      persistInventory: true
+      clearInitialInventory: true
+      invincible: false
+      fly: false
+      flaming: true
+      kit: false
+      returnToBed: true
+      environment: NETHER
+      mobChance: 0
+  chance:
+    dream: 100
+    nightmare: 20
+  options:
+    allowAll: true
+    attemptWait: 0
+    message: ''
+    wakeup: true
+    weatherDisable: false
+  fly:
+    speed: 1.0
+    tool: 288

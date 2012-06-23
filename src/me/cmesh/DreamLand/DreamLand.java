@@ -119,48 +119,20 @@ public class DreamLand extends JavaPlugin
 	
 	public void reload()
 	{
-		setupDream();
-		setupNightmare();
+		reloadConfig();
+		getConfig().options().copyDefaults(true);
+		saveConfig();
+		
+		dream.load("dream");
+		nightmare.load("nightmare");
 		setupBase();
 		options.load();
-	}
-	
-	private void setupDream()
-	{
-		dream.World = getServer().getWorlds().get(0).getName() + "_dream";
-		dream.PersistInventory = true;
-		dream.InitialInventoryClear = true;
-		dream.Invincible = true;
-		dream.Fly = true;
-		dream.Flaming = false;
-		dream.Kit = true;
-		dream.Chance = 100;
-		dream.ReturnToBed = true;
-		dream.environment = Environment.NORMAL;//Environment.SKYLANDS;
-		dream.Generator = "SkylandsPlus";
-		dream.load("dream");
-	}
-	private void setupNightmare()
-	{
-		nightmare.World = getServer().getWorlds().get(0).getName() + "_nightmare";
-		nightmare.PersistInventory = false;
-		nightmare.InitialInventoryClear = true;
-		nightmare.Invincible = false;
-		nightmare.Fly = false;
-		nightmare.Flaming = true;
-		nightmare.Kit = false;
-		nightmare.Chance = 20;
-		nightmare.ReturnToBed = true;
-		nightmare.environment = Environment.NETHER;
-		nightmare.load("nightmare");
 	}
 	
 	private void setupBase()
 	{
 		FileConfiguration config = getConfig();
 		base.PersistInventory = config.getBoolean("dreamland.worlds.default.persistInventory",true);
-		config.getBoolean("dreamland.worlds.default.persistInventory",true);
-		saveConfig();
 	}
 	
 	public DreamLandWorld world(World world)
