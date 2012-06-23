@@ -120,7 +120,17 @@ public class DreamLandPlayer
 
 	public Boolean hasPermission(String permission, Boolean expected)
 	{
-		return player.isOp() || player.hasPermission(permission);
+		boolean permissions = false;
+		boolean permissionsEx = false;
+		if(plugin.PermissionEnabled())
+		{
+			permissions = plugin.permissionsPlugin.permission(player, permission);
+		}
+		if(plugin.PermissionExEnabled())
+		{
+			permissionsEx = plugin.permissionsExPlugin.has(player, permission);
+		}
+		return player.isOp() || player.hasPermission(permission) || permissions || permissionsEx;
 	}
 	
 	private class health
