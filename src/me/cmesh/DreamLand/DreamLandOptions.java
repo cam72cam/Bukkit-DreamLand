@@ -8,10 +8,8 @@ public class DreamLandOptions
 {
 	public static DreamLand plugin;
 
-	public Boolean anyoneCanGo;  
-	public Integer flyTool;
+	public Boolean anyoneCanGo;
 	public ItemStack[] kit;
-	public Double flySpeed;
 	public Integer attemptWait;
 	public String message;
 	public Boolean morningReturn;
@@ -19,8 +17,6 @@ public class DreamLandOptions
 	public Boolean weatherDisable;
 
 	private static String anyoneCanGoPath = "dreamland.options.allowAll";
-	private static String flyToolPath = "dreamland.fly.tool";
-	private static String flySpeedPath = "dreamland.fly.speed";
 	private static String attemptWaitPath = "dreamland.options.attemptWait";
 	private static String messagePath = "dreamland.options.message";
 	private static String morningReturnPath = "dreamland.options.wakeup";
@@ -43,10 +39,6 @@ public class DreamLandOptions
 		message = config.getString(messagePath, "");
 		morningReturn = config.getBoolean(morningReturnPath, true);
 		weatherDisable = config.getBoolean(weatherDisablePath, false);
-		
-		//fly
-		flySpeed = config.getDouble(flySpeedPath, 1.0);
-		flyTool = config.getInt(flyToolPath,288);
 		
 		//kit
 		if(config.contains(kitPath))

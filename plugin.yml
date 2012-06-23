@@ -1,6 +1,7 @@
 name: DreamLand
 main: me.cmesh.DreamLand.DreamLand
-version: 3.5
+version: 4.0
+softdepend: [SmoothFlight]
 commands:
    wakeup:
       description: User will leave the dream they are in

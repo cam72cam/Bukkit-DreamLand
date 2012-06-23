@@ -32,6 +32,3 @@ dreamland:
     message: ''
     wakeup: true
     weatherDisable: false
-  fly:
-    speed: 1.0
-    tool: 288
