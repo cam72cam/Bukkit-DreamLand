@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;

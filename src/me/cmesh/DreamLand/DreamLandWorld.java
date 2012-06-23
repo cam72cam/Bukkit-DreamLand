@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.World.Environment;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.WorldCreator;
 
 import org.bukkit.World;
@@ -61,6 +62,29 @@ public class DreamLandWorld
 			}
 		}
 		catch(NullPointerException e){}
+		
+		if(Fly)
+		{
+			Plugin p = plugin.getServer().getPluginManager().getPlugin("SmoothFlight");
+			if (p != null && p.isEnabled()) 
+			{
+				me.cmesh.SmoothFlight.SmoothFlight smooth = ((me.cmesh.SmoothFlight.SmoothFlight)p);
+				if(smooth != null)
+				{
+					try
+					{
+						smooth.addDreamWorld(World);
+					return;
+					}
+					catch (Exception e)
+					{
+						DreamLand.log.warning("Smoothflight is out of date, this version is in compatible with dreamland");
+					}
+				}
+				DreamLand.log.warning("To fly in dreamland, Smoothflight must be enabled");
+			}
+			DreamLand.log.warning("To fly in dreamland, please install Smoothflight");
+		}
 	}
 	
 	public void create()

@@ -4,9 +4,7 @@ import java.util.Random;
 
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
-import org.bukkit.util.Vector;
 import org.bukkit.event.*;
 
 
@@ -24,24 +22,6 @@ public class DreamLandPlayerListener implements Listener
 	public void onPlayerPortal(PlayerPortalEvent event)
 	{
 		event.setCancelled(plugin.player(event.getPlayer()).Dreaming());
-	}
-
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerInteract(PlayerInteractEvent event)
-	{
-		DreamLandPlayer player = plugin.player(event.getPlayer());
-		
-		if (player.hasPermission("dreamland.fly",true))
-			if (plugin.world(player.getWorld()).Fly)
-				if (plugin.options.flyTool == event.getPlayer().getItemInHand().getTypeId())
-					if (event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK))
-					{
-						Vector dir = player.getLocation().getDirection().multiply(plugin.options.flySpeed);
-						dir.setY(dir.getY()+0.60);
-						player.self().setVelocity(dir);
-						player.self().setFallDistance(0);
-						player.lastFly = player.getWorld().getTime();
-					}
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
