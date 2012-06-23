@@ -24,7 +24,6 @@ public class DreamLandOptions
 	private static String attemptWaitPath = "dreamland.options.attemptWait";
 	private static String messagePath = "dreamland.options.message";
 	private static String morningReturnPath = "dreamland.options.wakeup";
-	private static String signedBedPath = "dreamland.options.signedBed";
 	private static String weatherDisablePath = "dreamland.options.weatherDisable";
 	
 	private static String kitPath = "dreamland.inventory.kit";
