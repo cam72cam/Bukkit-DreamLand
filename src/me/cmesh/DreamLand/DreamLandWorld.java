@@ -56,10 +56,7 @@ public class DreamLandWorld
 		
 		try
 		{
-			for(String node : config.getStringList(endpoint +"mobs"))
-			{
-				Mobs.add(node);
-			}
+			Mobs = config.getStringList(endpoint +"mobs");
 		}
 		catch(NullPointerException e){}
 		
@@ -78,7 +75,7 @@ public class DreamLandWorld
 					}
 					catch (Exception e)
 					{
-						DreamLand.log.warning("Smoothflight is out of date, this version is in compatible with dreamland");
+						DreamLand.log.warning("Smoothflight is out of date, this version is incompatible with dreamland");
 					}
 				}
 				DreamLand.log.warning("To fly in dreamland, Smoothflight must be enabled");

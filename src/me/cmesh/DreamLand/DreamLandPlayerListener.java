@@ -63,7 +63,7 @@ public class DreamLandPlayerListener implements Listener
 		            {
 		            	Location loc = player.getLocation();
 		            	loc.setX(loc.getX() + 10);
-		                world.getWorld().spawnCreature(loc, ct);
+		                world.getWorld().spawnEntity(loc, ct);
 		            }
 				}
 			}

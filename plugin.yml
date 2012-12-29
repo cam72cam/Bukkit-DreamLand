@@ -1,6 +1,6 @@
 name: DreamLand
 main: me.cmesh.DreamLand.DreamLand
-version: 4.0
+version: 4.1
 softdepend: [SmoothFlight]
 commands:
    wakeup:

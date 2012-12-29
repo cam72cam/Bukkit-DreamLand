@@ -11,7 +11,7 @@ public class Scheduler
 	
 	public void Start()
     {
-		plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new CheckTime(), 0L, 1000L);
+		plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new CheckTime(), 0L, 1000L);
     }
 
     public void Stop()

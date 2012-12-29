@@ -100,7 +100,6 @@ public class DreamLandPlayer
 		
 		player.teleport(loc);
 		player.setLastDamage(0);
-		player.getLastDamageCause().setCancelled(true);
 	}
 	public Location respawn()
 	{
@@ -226,7 +225,7 @@ public class DreamLandPlayer
 		{
 			File save = playerInv(world);
 			if (save.exists()) 
-			{		
+			{
 				if(plugin.world(world).PersistInventory)
 				{
 						player.getInventory().clear();
