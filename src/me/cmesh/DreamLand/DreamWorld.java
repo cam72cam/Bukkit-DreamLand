@@ -7,6 +7,7 @@ import java.util.*;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.world.PortalCreateEvent;
@@ -17,7 +18,8 @@ public class DreamWorld {
 	private FileConfiguration worldConfig;
 	private World self;
 
-	private List<DreamWorld> nextWorlds = new ArrayList<DreamWorld>(); 
+	private List<DreamWorld> nextWorlds = new ArrayList<DreamWorld>();
+	private Map<String, Integer> chanceMap = new HashMap<String, Integer>();
 	
 	public DreamWorld(String worldName) {
 
@@ -59,14 +61,17 @@ public class DreamWorld {
 	}
 	
 	public void Load() {
-		List<String> next = worldConfig.getStringList(settingNextWorlds);
-		for(String w : next) {
-			DreamLandPlugin.log.info("Start " + w);
-			DreamWorld world = DreamLandPlugin.Instance.worlds.getWorld(w);
-			if (world == null) {
-				world = DreamLandPlugin.Instance.worlds.createWorld(w);
+		ConfigurationSection nextWorldConfig = worldConfig.getConfigurationSection(settingNextWorlds);
+		if(nextWorldConfig != null) {
+			for(String worldName : nextWorldConfig.getKeys(false)) {
+				chanceMap.put(worldName, nextWorldConfig.getInt(worldName));
+				
+				DreamWorld world = DreamLandPlugin.Instance.worlds.getWorld(worldName);
+				if (world == null) {
+					world = DreamLandPlugin.Instance.worlds.createWorld(worldName);
+				}
+				nextWorlds.add(world);
 			}
-			nextWorlds.add(world);
 		}
 	}
 	
@@ -81,8 +86,29 @@ public class DreamWorld {
 	}
 
 	public DreamWorld chooseNextWorld() {
+		Integer total = 0;
+		for(Integer chance : chanceMap.values()) {
+			total += chance;
+		}
+		
+		
+		Random randy = new Random();
+		Integer value = randy.nextInt(total);
+		
+		DreamWorld next = null;
+		
+		Integer current = 0;
+		for(DreamWorld w : nextWorlds) {
+			Integer chance = chanceMap.get(w.getName());
+			if(value >= current && value < current + chance) {
+				next = w;
+				break;
+			}
+			current += chance;
+		}
+		
 		// TODO factor in random chance
-		return nextWorlds.get(0);
+		return next;
 	}
 
 	public Location getDreamSpawn() {

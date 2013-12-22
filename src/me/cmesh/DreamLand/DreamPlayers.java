@@ -10,9 +10,11 @@ public class DreamPlayers {
 	private  HashMap<UUID, DreamPlayer> self = new HashMap<UUID, DreamPlayer> (); 
 	
 	public void add(Player player) {
-		DreamLandPlugin.log.info("Adding player " + player.getName());
-		DreamPlayer dlPlayer = new DreamPlayer(player);
-		self.put(player.getUniqueId(), dlPlayer);
+		if(!self.containsKey(player.getUniqueId())) {
+			DreamLandPlugin.log.info("Adding player " + player.getName());
+			DreamPlayer dlPlayer = new DreamPlayer(player);
+			self.put(player.getUniqueId(), dlPlayer);
+		}
 	}
 	
 	public DreamPlayer get(Player player) {
