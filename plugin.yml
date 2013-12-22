@@ -1,6 +1,6 @@
 name: DreamLand
-main: me.cmesh.DreamLand.DreamLand
-version: 4.1
+main: me.cmesh.DreamLand.DreamLandPlugin
+version: 5.0
 softdepend: [SmoothFlight]
 commands:
    wakeup:
